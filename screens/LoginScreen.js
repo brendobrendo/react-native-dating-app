@@ -1,46 +1,47 @@
-import { StyleSheet, TextInput, KeyboardAvoidingView, View, TouchableOpacity, Text } from 'react-native'
+import { StyleSheet, TextInput, KeyboardAvoidingView, View, TouchableOpacity, Text, Image} from 'react-native'
 import React, { useState } from 'react';
 
 const LoginScreen = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
 
-  return (
-    <KeyboardAvoidingView
-        style={styles.container}
-        behavior="padding"
-    >
-        <View style={styles.inputConatinaer}>
-            <TextInput 
-                placeholder='Email'
-                value={ email }
-                onChangeText={text => setEmail(text)}
-                style={styles.input}
-            />
-            <TextInput 
-                placeholder='Password'
-                value={ password }
-                onChangeText={text => setPassword(text)}
-                style={styles.input}
-                secureTextEntry
-            />
-        </View>
-        <View style={styles.buttonContainer}>
-            <TouchableOpacity
-                onPress={() => {}}
-                style = {styles.button}
-            >
-                <Text style={styles.buttonText}>Login</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-                onPress={() => {}}
-                style = {[styles.button, styles.buttonOutline]}
-            >
-                <Text style={styles.buttonOutlineText}>Register</Text>
-            </TouchableOpacity>
-        </View>
-    </KeyboardAvoidingView>
-  )
+    return (
+        <KeyboardAvoidingView
+            style={styles.container}
+            behavior="padding"
+        >
+            <Image style={styles.logo} source={require('../assets/images/test.png')}/>
+            <View style={styles.inputContainer}>
+                <TextInput
+                    placeholder='Email'
+                    value={email}
+                    onChangeText={text => setEmail(text)}
+                    style={styles.input}
+                />
+                <TextInput
+                    placeholder='Password'
+                    value={password}
+                    onChangeText={text => setPassword(text)}
+                    style={styles.input}
+                    secureTextEntry
+                />
+            </View>
+            <View style={styles.buttonContainer}>
+                <TouchableOpacity
+                    onPress={() => { }}
+                    style={styles.loginbutton}
+                >
+                    <Text style={styles.loginbuttonText}>Login</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    onPress={() => { }}
+                    style={styles.registerbutton}
+                >
+                    <Text style={styles.registerbuttonText}>Register</Text>
+                </TouchableOpacity>
+            </View>
+        </KeyboardAvoidingView>
+    )
 }
 
 export default LoginScreen
@@ -50,43 +51,55 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
+        width: "70%"
     },
-    inputConatinaer: {
-        width: '80%'
+    inputContainer: {
+        width: '100%'
     },
     input: {
         backgroundColor: 'white',
         paddingHorizontal: 15,
         paddingVertical: 10,
         borderRadius: 10,
-        marginTop: 5,
+        marginTop: 10,
+        borderWidth: 1,
+        borderColor: "grey",
     },
     buttonContainer: {
-        width: '60%',
+        width: '48%',
         justifyContent: 'center',
         alignItems: 'center',
         marginTop: 40,
+        flexDirection: "row",
     },
-    button: {
+    loginbutton: {
         backgroundColor: '#FF6F61',
         width: '100%',
         padding: 15,
         borderRadius: 10,
+        marginRight: 10
     },
-    buttonText: {
+    loginbuttonText: {
         color: 'white',
         fontWeight: '700',
         fontSize: 16,
+        textAlign: "center"
     },
-    buttonOutline: {
-        marginTop: 5,
-        backgroundColor: 'white',
-        borderColor: '#FF6F61',
+    registerbutton: {
+        backgroundColor: '#ffffff',
+        width: '100%',
+        padding: 13,
+        borderRadius: 10,
         borderWidth: 2,
+        borderColor: "#FF6F61"
     },
-    buttonOutlineText: {
+    registerbuttonText: {
         color: '#FF6F61',
         fontWeight: '700',
         fontSize: 16,
+        textAlign: "center"
     },
+    logo: {
+        width: "25%"
+    }
 })
