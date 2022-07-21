@@ -87,10 +87,12 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        width: "70%"
+        //width: "70%"
     },
     inputContainer: {
-        width: '100%'
+        // width: '100%'
+        width: '80%',
+
     },
     input: {
         backgroundColor: 'white',
@@ -102,7 +104,7 @@ const styles = StyleSheet.create({
         borderColor: "grey",
     },
     buttonContainer: {
-        width: '48%',
+        //width: '48%',
         justifyContent: 'center',
         alignItems: 'center',
         marginTop: 40,
@@ -110,7 +112,8 @@ const styles = StyleSheet.create({
     },
     loginbutton: {
         backgroundColor: '#FF6F61',
-        width: '100%',
+        //width: '100%',
+        width: '38%',
         padding: 15,
         borderRadius: 10,
         marginRight: 10
@@ -123,7 +126,8 @@ const styles = StyleSheet.create({
     },
     registerbutton: {
         backgroundColor: '#ffffff',
-        width: '100%',
+        //width: '100%',
+        width: '38%',
         padding: 13,
         borderRadius: 10,
         borderWidth: 2,
