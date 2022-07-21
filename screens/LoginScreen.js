@@ -1,4 +1,4 @@
-import { StyleSheet, TextInput, KeyboardAvoidingView, View, TouchableOpacity, Text, Image} from 'react-native'
+import { StyleSheet, TextInput, KeyboardAvoidingView, View, Text, Image, Pressable} from 'react-native'
 import React, { useState, useEffect } from 'react';
 import { auth } from '../firebase';
 import { useNavigation } from '@react-navigation/core';
@@ -63,18 +63,18 @@ const LoginScreen = () => {
                 />
             </View>
             <View style={styles.buttonContainer}>
-                <TouchableOpacity
+                <Pressable
                     onPress={handleLogin}
                     style={styles.loginbutton}
                 >
                     <Text style={styles.loginbuttonText}>Login</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
+                </Pressable>
+                <Pressable
                     onPress={handleSignUp}
                     style={styles.registerbutton}
                 >
                     <Text style={styles.registerbuttonText}>Register</Text>
-                </TouchableOpacity>
+                </Pressable>
             </View>
         </KeyboardAvoidingView>
     )
