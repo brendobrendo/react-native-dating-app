@@ -100,6 +100,8 @@ const styles = StyleSheet.create({
         textAlign: "center"
     },
     logo: {
-        width: "25%"
+        width: 100,
+        height: 100,
+        margin: 20
     }
 })
