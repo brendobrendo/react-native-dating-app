@@ -1,48 +1,51 @@
-import { StyleSheet, Text, View, Pressable } from 'react-native'
+import { StyleSheet, Text, View, Pressable, Image } from 'react-native'
 import React, { useState } from 'react'
 import { useNavigation } from '@react-navigation/core'
 import { auth } from '../firebase'
 import UserProfile from './UserProfile'
+import Messages from './Messages'
 
 
 const HomeScreen = () => {
-  const navigation = useNavigation()
 
   const [userModal, setUserModal] = useState(false);
+  const [messagesModal, setMessagesModal] = useState(false);
 
 
   const closeUser = () => {
-      setUserModal(false)
+    setUserModal(false)
   }
 
   const openuser = () => {
     setUserModal(true)
   }
 
-  const handleSignOut = () => {
-    auth
-      .signOut()
-      .then(() => {
-        navigation.replace("Login")
-      })
-      .catch(error => alert(error.message))
+  const closeMessages = () => {
+    setMessagesModal(false)
+  }
+
+  const openMessages = () => {
+    setMessagesModal(true)
   }
 
   return (
     <View style={styles.container}>
-      <UserProfile visible={userModal} closeUser={closeUser}/>
-      <Pressable
-        onPress={openuser}
-        >
-          <Text style={styles.buttonText}>User info</Text>
-      </Pressable>
-      <Text>Email: {auth.currentUser?.email}</Text>
-      <Pressable
-        onPress={handleSignOut}
-        style={styles.button}
-      >
-        <Text style={styles.buttonText}>Sign out</Text>
-      </Pressable>
+      {/* modals */}
+      <UserProfile visible={userModal} closeUser={closeUser} />
+      <Messages visible={messagesModal} closeMessages={closeMessages} />
+
+      {/* top buttons */}
+      <View style={styles.profile}>
+        <Pressable onPress={openMessages}>
+            <Image style={styles.image} source={require('../assets/images/messageicon.png')} />
+        </Pressable>
+        <Text style={styles.messagenumber}>10</Text>
+        <Pressable onPress={openuser}>
+          <Image style={styles.image} source={require('../assets/images/profileicon.png')} />
+        </Pressable>
+      </View>
+
+      <Text style={styles.temp}>Email: {auth.currentUser?.email}</Text>
     </View>
   )
 }
@@ -54,6 +57,17 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center'
+  },
+  profile: {
+    flex: 1,
+    paddingTop: 30,
+    alignSelf: "flex-end",
+    flexDirection: "row",
+  },
+  image: {
+    width: 40,
+    height: 40,
+    margin: 5
   },
   button: {
     backgroundColor: '#0782F9',
@@ -68,4 +82,13 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     fontSize: 16,
   },
+  messagenumber: {
+    color: "#0782F9",
+    marginLeft: -15,
+    fontSize: 20,
+    backgroundColor: "lightblue",
+    height: 30,
+    paddingHorizontal: 5,
+    borderRadius: 20
+  }
 })
