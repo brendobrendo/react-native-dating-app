@@ -1,9 +1,12 @@
 import { StyleSheet, Text, View, Pressable, Image } from 'react-native'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useNavigation } from '@react-navigation/core'
 import { auth } from '../firebase'
 import UserProfile from './UserProfile'
 import Messages from './Messages'
+import axios from 'axios'
+import { ApiRoot, ApiTest }  from "./Api" 
+
 
 
 const HomeScreen = () => {
@@ -27,6 +30,18 @@ const HomeScreen = () => {
   const openMessages = () => {
     setMessagesModal(true)
   }
+  const [booktest, setbooktest] = useState("")
+  console.log(ApiRoot)
+  console.log(ApiTest)
+
+  useEffect(() =>{
+    axios.get(`${ApiRoot}/api/books`)
+    .then((Response) => {
+      console.log(Response.data[0].title)
+      setbooktest(Response.data[0].title)
+    })
+    .catch((err) => console.log(err))
+  },[])
 
   return (
     <View style={styles.container}>
@@ -44,7 +59,7 @@ const HomeScreen = () => {
           <Image style={styles.image} source={require('../assets/images/profileicon.png')} />
         </Pressable>
       </View>
-
+      <Text>{booktest}</Text>
       <Text style={styles.temp}>Email: {auth.currentUser?.email}</Text>
     </View>
   )

@@ -1,7 +1,9 @@
 import { StyleSheet, Text, View, Modal, Pressable, Image } from 'react-native'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useNavigation } from '@react-navigation/core'
-import { auth } from '../firebase'
+import { auth, storage } from '../firebase'
+import { ref, uploadBytes } from "firebase/storage"
+
 
 const UserProfile = (props) => {
 
@@ -19,10 +21,17 @@ const UserProfile = (props) => {
             .catch(error => alert(error.message))
     }
 
+    useEffect(() => {
+        const imageUpload = require("../assets/images/test.png")
+            if (imageUpload == null) return;
+            const imageRef = ref(storage, 'images/test.png');
+            uploadBytes(imageRef, imageUpload);
+    }, [])
+
     return (
         <Modal visible={props.visible} animationType="slide">
             <View style={styles.container}>
-                
+
                 <View style={styles.username}>
                     <Text style={styles.fontSize}>
                         user in db's
