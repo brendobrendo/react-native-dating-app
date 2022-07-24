@@ -2,24 +2,18 @@ import { StyleSheet, Text, View, Modal, Pressable, Image } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { useNavigation } from '@react-navigation/core';
 import { authentication } from '../firebase';
-import { signOut } from 'firebase/auth';
 import { ref, uploadBytes } from "firebase/storage"
 
 
 const UserProfile = (props) => {
 
-    const navigation = useNavigation()
-
     const [age, setAge] = useState("")
     const [gender, setGender] = useState("")
 
-    const handleSignOut = () => {
-        console.log('I will get you my pretty 2');
-        signOut(authentication)
-        .then(() => {
-            navigation.replace("Login")
-        })
-        .catch(error => alert(error.message))
+    
+
+    const handleUpdate = () => {
+        console.log('Updating');
     }
 
     // useEffect(() => {
@@ -30,7 +24,7 @@ const UserProfile = (props) => {
     // }, [])
 
     return (
-        <Modal visible={props.visible} animationType="slide">
+        <Modal visible={props.isVisible} animationType="slide">
             <View style={styles.container}>
 
                 <View style={styles.username}>
@@ -50,7 +44,7 @@ const UserProfile = (props) => {
                         {"\n"}
                         Gender: {gender}
                     </Text>
-                    <Pressable style={styles.button} onPress={""}>
+                    <Pressable style={styles.button} onPress={handleUpdate}>
                         <Text style={styles.buttonText}>Update Info</Text>
                     </Pressable>
 
@@ -64,7 +58,7 @@ const UserProfile = (props) => {
 
 
                 <Pressable
-                    onPress={handleSignOut}
+                    onPress={props.signOut}
                     style={styles.button}
                 >
                     <Text style={styles.buttonText}>Sign out</Text>

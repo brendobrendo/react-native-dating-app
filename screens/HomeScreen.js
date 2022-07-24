@@ -5,7 +5,8 @@ import { authentication } from '../firebase'
 import UserProfile from './UserProfile'
 import Messages from './Messages'
 import axios from 'axios'
-import { ApiRoot, ApiTest }  from "./Api" 
+import { ApiRoot, ApiTest }  from "./Api";
+import { signOut } from 'firebase/auth';
 
 
 
@@ -13,10 +14,19 @@ const HomeScreen = () => {
 
   const [userModal, setUserModal] = useState(false);
   const [messagesModal, setMessagesModal] = useState(false);
+  const navigation = useNavigation()
 
-
+  const handleSignOut = () => {
+    signOut(authentication)
+    .then(() => {
+        closeUser();
+        navigation.replace("Login");   
+    })
+    .catch(error => alert(error.message))
+  }
+  
   const closeUser = () => {
-    console.log('I will get you my pretty')
+    console.log('Am I even coming in here')
     setUserModal(false)
   }
 
@@ -47,7 +57,7 @@ const HomeScreen = () => {
   return (
     <View style={styles.container}>
       {/* modals */}
-      <UserProfile visible={userModal} closeUser={closeUser} />
+      <UserProfile isVisible={userModal} closeUser={closeUser} signOut={handleSignOut} />
       <Messages visible={messagesModal} closeMessages={closeMessages} />
 
       {/* top buttons */}

@@ -14,6 +14,7 @@ const LoginScreen = () => {
     useEffect(() => {
         const unsubscribe = authentication.onAuthStateChanged(user => {
             if (user) {
+                console.log('here i am again... again')
                 navigation.navigate("Home")
             }
         })
