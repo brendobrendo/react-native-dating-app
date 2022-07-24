@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View, Modal, Pressable, Image } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { useNavigation } from '@react-navigation/core'
-import { auth, storage } from '../firebase'
+import { authentication } from '../firebase'
 import { ref, uploadBytes } from "firebase/storage"
 
 
@@ -21,12 +21,12 @@ const UserProfile = (props) => {
             .catch(error => alert(error.message))
     }
 
-    useEffect(() => {
-        const imageUpload = require("../assets/images/test.png")
-            if (imageUpload == null) return;
-            const imageRef = ref(storage, 'images/test.png');
-            uploadBytes(imageRef, imageUpload);
-    }, [])
+    // useEffect(() => {
+    //     const imageUpload = require("../assets/images/test.png")
+    //         if (imageUpload == null) return;
+    //         const imageRef = ref(storage, 'images/test.png');
+    //         uploadBytes(imageRef, imageUpload);
+    // }, [])
 
     return (
         <Modal visible={props.visible} animationType="slide">

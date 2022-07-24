@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View, Pressable, Image } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { useNavigation } from '@react-navigation/core'
-import { auth } from '../firebase'
+import { authentication } from '../firebase'
 import UserProfile from './UserProfile'
 import Messages from './Messages'
 import axios from 'axios'
@@ -60,7 +60,7 @@ const HomeScreen = () => {
         </Pressable>
       </View>
       <Text>{booktest}</Text>
-      <Text style={styles.temp}>Email: {auth.currentUser?.email}</Text>
+      <Text style={styles.temp}>Email: {authentication.currentUser?.email}</Text>
     </View>
   )
 }

@@ -1,6 +1,7 @@
 import { StyleSheet, TextInput, KeyboardAvoidingView, View, Text, Image, Pressable} from 'react-native'
 import React, { useState, useEffect } from 'react';
-import { auth } from '../firebase';
+import { authentication } from '../firebase';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 import { useNavigation } from '@react-navigation/core';
 
 const LoginScreen = () => {
@@ -11,7 +12,7 @@ const LoginScreen = () => {
     // use useEffect so that the function runs when 
     // the component mounts
     useEffect(() => {
-        const unsubscribe = auth.onAuthStateChanged(user => {
+        const unsubscribe = authentication.onAuthStateChanged(user => {
             if (user) {
                 navigation.navigate("Home")
             }
@@ -22,8 +23,7 @@ const LoginScreen = () => {
 
 
     const handleSignUp = () => {
-        auth.
-            createUserWithEmailAndPassword(email, password)
+        createUserWithEmailAndPassword(authentication, email, password)
             .then(userCredentials => {
                 const user = userCredentials.user;
                 console.log(user.email);
@@ -32,8 +32,7 @@ const LoginScreen = () => {
     }
 
     const handleLogin = () => {
-        auth
-            .signInWithEmailAndPassword(email, password)
+        signInWithEmailAndPassword(authentication, email, password)
             .then(userCredentials => {
                 const user = userCredentials.user;
                 console.log('logged in with', user.email);
