@@ -16,6 +16,7 @@ const HomeScreen = () => {
 
 
   const closeUser = () => {
+    console.log('I will get you my pretty')
     setUserModal(false)
   }
 

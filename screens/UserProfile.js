@@ -1,7 +1,8 @@
-import { StyleSheet, Text, View, Modal, Pressable, Image } from 'react-native'
-import React, { useEffect, useState } from 'react'
-import { useNavigation } from '@react-navigation/core'
-import { authentication } from '../firebase'
+import { StyleSheet, Text, View, Modal, Pressable, Image } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { useNavigation } from '@react-navigation/core';
+import { authentication } from '../firebase';
+import { signOut } from 'firebase/auth';
 import { ref, uploadBytes } from "firebase/storage"
 
 
@@ -13,12 +14,12 @@ const UserProfile = (props) => {
     const [gender, setGender] = useState("")
 
     const handleSignOut = () => {
-        auth
-            .signOut()
-            .then(() => {
-                navigation.replace("Login")
-            })
-            .catch(error => alert(error.message))
+        console.log('I will get you my pretty 2');
+        signOut(authentication)
+        .then(() => {
+            navigation.replace("Login")
+        })
+        .catch(error => alert(error.message))
     }
 
     // useEffect(() => {
@@ -80,13 +81,14 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
+        paddingVertical: 50,
     },
     username: {
         flex: 1,
     },
     fontSize: {
-        fontSize: 35,
+        fontSize: 20,
         textAlign: "center"
     },
     image: {
