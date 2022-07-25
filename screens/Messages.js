@@ -11,7 +11,7 @@ const Messages = (props) => {
             <View>
                 <Text>Hello World</Text>
             </View>
-            <Pressable onPress={props.closeMessages}>
+            <Pressable style={styles.test} onPress={props.closeMessages}>
                 <Text>Close messages</Text>
             </Pressable>
         </Modal>
@@ -20,4 +20,9 @@ const Messages = (props) => {
 
 export default Messages
 
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({
+    test:{
+        borderColor: "red",
+        borderWidth: 1
+    }
+})
