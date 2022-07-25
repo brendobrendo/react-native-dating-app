@@ -1,32 +1,36 @@
-import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
-import React from 'react';
-import { query, collection, getDocs } from 'firebase/firestore/lite';
+import { Modal, Pressable, StyleSheet, Text, View, FlatList } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { collection, getDocs } from 'firebase/firestore/lite';
 import { db } from '../firebase';
 
 const Messages = (props) => {
+    const [messages, setMessages] = useState([]);
 
-    const getData = async () => {
-        
-        const messagesCol = await getDocs(collection(db, 'messages'));
-        const messagesList = messagesCol.docs.map(doc => doc.data());
+    useEffect(() => {
+        const getData = async () => {
+            const messagesCol = await getDocs(collection(db, 'messages'));
+            const messagesList = messagesCol.docs.map(doc => doc.data());
 
-        console.log(messagesList);
-    }
+            setMessages(messagesList)
+        }
+
+        getData()
+      }, messages);
 
     return (
         <Modal visible={props.visible} animationType="slide" style={styles.container}>
-            <View>
-                <Text>Messages</Text>
-            </View>
-            <View>
-                <Text>Hello World</Text>
-            </View>
             <Pressable onPress={props.closeMessages} style={styles.button}>
                 <Text style={styles.buttonText}>Close messages</Text>
             </Pressable>
-            <Pressable onPress={getData} style={styles.button}>
-                <Text style={styles.buttonText}>Get Data</Text>
-            </Pressable>
+            <View style={styles.messagesContainer}>
+                <FlatList data={messages}
+                renderItem={(msgData) => {
+                    return (
+                        <Text>{msgData.item.text}</Text>
+                    )
+                }}
+            />
+            </View>
         </Modal>
     )
 }
@@ -52,4 +56,5 @@ const styles = StyleSheet.create({
         fontWeight: '700',
         fontSize: 16,
       },
+      messagesContainer: {}
 })
