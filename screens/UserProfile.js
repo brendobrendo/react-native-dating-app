@@ -1,27 +1,57 @@
-import { StyleSheet, Text, View, Modal, Pressable, Image } from 'react-native';
+import { StyleSheet, Text, View, Modal, Pressable, Image, ImagePickerIOS, Platform } from 'react-native';
 import React, { useEffect, useState } from 'react';
-import { useNavigation } from '@react-navigation/core';
+import * as imagePicker from "expo-image-picker"
+import { ref, uploadBytes, getStorage } from "firebase/storage"
 import { authentication } from '../firebase';
-import { ref, uploadBytes } from "firebase/storage"
 
 
 const UserProfile = (props) => {
 
+    const [username, setUsername] = useState("")
     const [age, setAge] = useState("")
     const [gender, setGender] = useState("")
 
-    
+
 
     const handleUpdate = () => {
         console.log('Updating');
     }
 
-    // useEffect(() => {
-    //     const imageUpload = require("../assets/images/test.png")
-    //         if (imageUpload == null) return;
-    //         const imageRef = ref(storage, 'images/test.png');
-    //         uploadBytes(imageRef, imageUpload);
-    // }, [])
+    // useEffect (() =>{
+    //     (async () => {
+    //         if (Platform.OS !== "web") {
+    //             const { staus } = await imagePicker.requestCameraPermissionsAsync();
+    //             if (staus !== "granted") {
+    //                 alert("give me camera")
+    //             } 
+    //         }
+    //     })();
+    // }, []);
+
+    useEffect (() => {
+        const user = authentication.currentUser.email
+        setUsername(user)
+    },[])
+
+    const pickImage = async () => {
+        let result = await imagePicker.launchCameraAsync({
+            mediaTypes: imagePicker.MediaTypeOptions.Images,
+            quality: .5,
+            maxWidth: 500,
+            maxHeight: 500
+        });
+
+        if (!result.cancelled) {
+            const store = getStorage();
+            const reference = ref(store, `profile-${username}.jpg`);
+
+            const img = await fetch(result.uri);
+            const bytes = await img.blob();
+
+            uploadBytes(reference, bytes);
+            console.log("uploaded profile pic")
+        }
+    }
 
     return (
         <Modal visible={props.isVisible} animationType="slide">
@@ -56,6 +86,10 @@ const UserProfile = (props) => {
                     </Pressable>
                 </View>
 
+
+                <Pressable onPress={pickImage}>
+                    <Text>Uplaod image</Text>
+                </Pressable>
 
                 <Pressable
                     onPress={props.signOut}
