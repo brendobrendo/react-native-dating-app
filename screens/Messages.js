@@ -18,9 +18,9 @@ const Messages = (props) => {
         
         getData()
         
-      }, messages);
+    }, messages);
 
-      const handleNewMessage = () => {
+    const handleNewMessage = () => {
         try {
             const docRef = addDoc(collection(db, "messages"), {
                 senderId: authentication.currentUser.uid,
@@ -40,7 +40,7 @@ const Messages = (props) => {
         } catch (e) {
             console.error("error adding document: ", e)
         }
-      }
+    }
 
     return (
         <Modal visible={props.visible} animationType="slide" style={styles.container}>
