@@ -78,16 +78,16 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center'
-      },
-      button: {
+    },
+    button: {
         backgroundColor: '#0782F9',
         width: '80%',
         padding: 15,
         borderRadius: 10,
         alignItems: 'center',
         marginTop: 40,
-      },
-      buttonText: {
+    },
+    buttonText: {
         color: 'white',
         fontWeight: '700',
         fontSize: 16,

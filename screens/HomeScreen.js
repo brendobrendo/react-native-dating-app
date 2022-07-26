@@ -5,7 +5,7 @@ import { authentication } from '../firebase'
 import UserProfile from './UserProfile'
 import Messages from './Messages'
 import axios from 'axios'
-import { ApiRoot, ApiTest }  from "./Api";
+import { ApiRoot, ApiTest } from "./Api";
 import { signOut } from 'firebase/auth';
 
 
@@ -18,13 +18,13 @@ const HomeScreen = () => {
 
   const handleSignOut = () => {
     signOut(authentication)
-    .then(() => {
+      .then(() => {
         closeUser();
-        navigation.replace("Login");   
-    })
-    .catch(error => alert(error.message))
+        navigation.replace("Login");
+      })
+      .catch(error => alert(error.message))
   }
-  
+
   const closeUser = () => {
     console.log('Am I even coming in here')
     setUserModal(false)
@@ -45,14 +45,14 @@ const HomeScreen = () => {
   console.log(ApiRoot)
   console.log(ApiTest)
 
-  useEffect(() =>{
+  useEffect(() => {
     axios.get(`${ApiRoot}/api/books`)
-    .then((Response) => {
-      console.log(Response.data[0].title)
-      setbooktest(Response.data[0].title)
-    })
-    .catch((err) => console.log(err))
-  },[])
+      .then((Response) => {
+        console.log(Response.data[0].title)
+        setbooktest(Response.data[0].title)
+      })
+      .catch((err) => console.log(err))
+  }, [])
 
   return (
     <View style={styles.container}>
@@ -61,17 +61,20 @@ const HomeScreen = () => {
       <Messages visible={messagesModal} closeMessages={closeMessages} />
 
       {/* top buttons */}
-      <View style={styles.profile}>
+      <View style={styles.header}>
         <Pressable onPress={openMessages}>
-            <Image style={styles.image} source={require('../assets/images/messageicon.png')} />
+          <Image style={styles.image} source={require('../assets/images/messageicon.png')} />
         </Pressable>
         <Text style={styles.messagenumber}>10</Text>
         <Pressable onPress={openuser}>
           <Image style={styles.image} source={require('../assets/images/profileicon.png')} />
         </Pressable>
       </View>
-      <Text>{booktest}</Text>
-      <Text style={styles.temp}>Email: {authentication.currentUser?.email}</Text>
+
+      <View style={styles.body}>
+        <Text>{booktest}</Text>
+        <Text style={styles.temp}>Email: {authentication.currentUser?.email}</Text>
+      </View>
     </View>
   )
 }
@@ -84,11 +87,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center'
   },
-  profile: {
-    flex: 1,
+  header: {
     paddingTop: 30,
     alignSelf: "flex-end",
     flexDirection: "row",
+    // borderColor: "red",
+    // borderWidth: 1,
+  },
+  body: {
+    flex: 1
   },
   image: {
     width: 40,
