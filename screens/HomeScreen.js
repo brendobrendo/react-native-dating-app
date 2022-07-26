@@ -26,7 +26,6 @@ const HomeScreen = () => {
   }
 
   const closeUser = () => {
-    console.log('Am I even coming in here')
     setUserModal(false)
   }
 
@@ -42,8 +41,6 @@ const HomeScreen = () => {
     setMessagesModal(true)
   }
   const [booktest, setbooktest] = useState("")
-  console.log(ApiRoot)
-  console.log(ApiTest)
 
   useEffect(() => {
     axios.get(`${ApiRoot}/api/books`)
@@ -57,7 +54,7 @@ const HomeScreen = () => {
   return (
     <View style={styles.container}>
       {/* modals */}
-      <UserProfile isVisible={userModal} closeUser={closeUser} signOut={handleSignOut} />
+      <UserProfile isVisible={userModal} closeUser={closeUser} signOut={handleSignOut}/>
       <Messages visible={messagesModal} closeMessages={closeMessages} />
 
       {/* top buttons */}

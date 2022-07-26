@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Modal, Pressable, Image, ImagePickerIOS, Platform } from 'react-native';
+import { StyleSheet, Text, View, Modal, Pressable, Image, Alert } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import * as imagePicker from "expo-image-picker"
 import { ref, uploadBytes, getStorage, deleteObject, getDownloadURL } from "firebase/storage"
@@ -8,36 +8,23 @@ import { Menu, MenuOptions, MenuOption, MenuTrigger, MenuProvider, renderers } f
 
 const UserProfile = (props) => {
 
-    const [username, setUsername] = useState("")
     const [url, setUrl] = useState("")
     const [age, setAge] = useState("")
     const [gender, setGender] = useState("")
-    const [pfupdate, setPfupdate] = useState("")
-
+    const [pfupdate, setPfupdate] = useState(0)
+    const useremail = authentication.currentUser.email
 
 
     const handleUpdate = () => {
         console.log('Updating');
     }
-
-    // useEffect (() =>{
-    //     (async () => {
-    //         if (Platform.OS !== "web") {
-    //             const { staus } = await imagePicker.requestCameraPermissionsAsync();
-    //             if (staus !== "granted") {
-    //                 alert("give me camera")
-    //             } 
-    //         }
-    //     })();
-    // }, []);
-
+    
     useEffect(() => {
-        const user = authentication.currentUser.email
-        setUsername(user)
         const store = getStorage();
-        getDownloadURL(ref(store, `profile-${username}.jpg`))
-            .then((url) => setUrl(url))
-        console.log(url)
+        setTimeout(() =>
+        getDownloadURL(ref(store, `profile-${useremail}.jpg`))
+            .then((url) => setUrl(url)).catch(err => setUrl(false))
+        , 1000)
     }, [pfupdate])
 
     const pickImage = async () => {
@@ -50,7 +37,7 @@ const UserProfile = (props) => {
 
         if (!result.cancelled) {
             const store = getStorage();
-            const reference = ref(store, `profile-${username}.jpg`);
+            const reference = ref(store, `profile-${useremail}.jpg`);
 
             const img = await fetch(result.uri);
             const bytes = await img.blob();
@@ -59,6 +46,7 @@ const UserProfile = (props) => {
             console.log("uploaded profile pic")
         }
         setPfupdate(Math.random());
+        console.log(pfupdate)
     }
 
     const pickGallery = async () => {
@@ -71,7 +59,7 @@ const UserProfile = (props) => {
 
         if (!result.cancelled) {
             const store = getStorage();
-            const reference = ref(store, `profile-${username}.jpg`);
+            const reference = ref(store, `profile-${useremail}.jpg`);
 
             const img = await fetch(result.uri);
             const bytes = await img.blob();
@@ -80,14 +68,26 @@ const UserProfile = (props) => {
             console.log("uploaded profile pic")
         }
         setPfupdate(Math.random());
+        console.log(pfupdate)
     }
 
-    const deleteImage = async () => {
+    const deleteImage = () =>{
+        Alert.alert(
+            "Delete profile pic?",
+            "",
+            [
+                {
+                    text: "Don't do it",
+                    onPress: () => {}
+                },
+                {text: "Do it!", onPress: () => deleteImageResponse()}
+            ]
+        )
+    }
+    const deleteImageResponse = async () => {
         const store = getStorage();
-        const reference = ref(store, `profile-${username}.jpg`);
-        deleteObject(reference).then(() => {
-            alert("profile pic deleted")
-        })
+        const reference = ref(store, `profile-${useremail}.jpg`);
+        deleteObject(reference).then()
             .catch((err) => {
                 alert("error deleting at this time")
             })
@@ -101,25 +101,12 @@ const UserProfile = (props) => {
 
                     <View style={styles.username}>
                         <Text style={styles.fontSize}>
-                            user in db's
+                            {useremail}'s
                             {"\n"}
                             Profile
 
                         </Text>
                     </View>
-
-                    {/* <View>
-                        <Menu>
-                            <MenuTrigger text='Select action' />
-                            <MenuOptions>
-                                <MenuOption onSelect={() => alert(`Save`)} text='Save' />
-                                <MenuOption onSelect={() => alert(`Delete`)} >
-                                    <Text style={{ color: 'red' }}>Delete</Text>
-                                </MenuOption>
-                                <MenuOption onSelect={() => alert(`Not called`)} disabled={true} text='Disabled' />
-                            </MenuOptions>
-                        </Menu>
-                    </View> */}
 
                     <View style={styles.info}>
                         <Menu renderer={renderers.SlideInMenu}>
@@ -190,7 +177,8 @@ const styles = StyleSheet.create({
     image: {
         width: 100,
         height: 100,
-        margin: 20
+        margin: 20,
+        borderRadius: 30
     },
     info: {
         flex: 4,
