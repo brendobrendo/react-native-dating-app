@@ -6,7 +6,7 @@ import ChatMessage from './ChatMessage';
 import * as Location from 'expo-location'
 
 const Messages = (props) => {
-    const [messages, setMessages] = useState(snapshotMessages);
+    const [messages, setMessages] = useState(["", "", "", "", ""]);
     const [messagesSent, setMessagesSent] = useState(0);
     const [newMessage, setNewMessage] = useState("");
 
@@ -18,6 +18,7 @@ const Messages = (props) => {
         const messagesCol = await getDocs(query(collection(db, 'messages'), orderBy('createdAt', 'desc'), limit(5)));
         const messagesList = messagesCol.docs.map(doc => doc.data());
 
+        setMessages(messagesList);
         return messagesList;
     }
 
