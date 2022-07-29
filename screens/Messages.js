@@ -1,26 +1,33 @@
 import { Modal, Pressable, StyleSheet, Text, View, FlatList, TextInput, KeyboardAvoidingView } from 'react-native';
 import React, { useState, useEffect } from 'react';
-import { collection, getDocs, addDoc, Timestamp, query, orderBy, limit, onSnapshot, doc } from 'firebase/firestore/lite';
+import { collection, getDocs, addDoc, Timestamp, query, orderBy, limit } from 'firebase/firestore/lite';
 import { db, authentication } from '../firebase';
 import ChatMessage from './ChatMessage';
 import * as Location from 'expo-location'
 
 const Messages = (props) => {
-    const [messages, setMessages] = useState([]);
+    const [messages, setMessages] = useState(snapshotMessages);
     const [messagesSent, setMessagesSent] = useState(0);
     const [newMessage, setNewMessage] = useState("");
 
-    useEffect(() => {
-        // const getData = async () => {
-        //     const messagesCol = await getDocs(collection(db, 'messages'));
-        //     const messagesList = messagesCol.docs.map(doc => doc.data());
+    const getMessages2 = async () => {
+        // getDocs => Executes a query and returns the result as a query snapshot
+            // query snapshot = 
+        // collection => Gets a collection reference at a specific path 
+            // In the example below, it gets the collectionRef of "messages" within our firestore instance
+        const messagesCol = await getDocs(query(collection(db, 'messages'), orderBy('createdAt', 'desc'), limit(5)));
+        const messagesList = messagesCol.docs.map(doc => doc.data());
 
-        //     setMessages(messagesList)
-        // }
-        
-        // getData()
-        
-    }, [] );
+        return messagesList;
+    }
+
+    // Creates global variable that holds messages query snapshot (should change in real time)
+    const snapshotMessages = getMessages2();
+    
+    useEffect(() => {
+        // Do I need to put anything in here?
+        // Just want it to re-render messages when a new message is added to the server
+    }, messages );
 
     const handleNewMessage = () => {
         try {
@@ -48,14 +55,6 @@ const Messages = (props) => {
 
         getMessages();
     }
-
-    const getMessages2 = async () => {
-        // const messagesCol = await getDocs(query(collection(db, 'messages'), orderBy('createdAt', 'desc'), limit(5)));
-        const messagesCol = await query(collection(db, 'messages'), orderBy('createdAt', 'desc'), limit(5));
-        console.log(messagesCol);
-    }
-
-    getMessages2();
 
     const locationHandler = async () => {
         // code to grab location, expo-location
