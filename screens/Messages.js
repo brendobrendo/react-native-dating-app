@@ -1,25 +1,26 @@
 import { Modal, Pressable, StyleSheet, Text, View, FlatList, TextInput, KeyboardAvoidingView } from 'react-native';
 import React, { useState, useEffect } from 'react';
-import { collection, getDocs, addDoc, Timestamp } from 'firebase/firestore/lite';
+import { collection, getDocs, addDoc, Timestamp, query, orderBy, limit, onSnapshot, doc } from 'firebase/firestore/lite';
 import { db, authentication } from '../firebase';
 import ChatMessage from './ChatMessage';
 import * as Location from 'expo-location'
 
 const Messages = (props) => {
     const [messages, setMessages] = useState([]);
+    const [messagesSent, setMessagesSent] = useState(0);
     const [newMessage, setNewMessage] = useState("");
 
     useEffect(() => {
-        const getData = async () => {
-            const messagesCol = await getDocs(collection(db, 'messages'));
-            const messagesList = messagesCol.docs.map(doc => doc.data());
+        // const getData = async () => {
+        //     const messagesCol = await getDocs(collection(db, 'messages'));
+        //     const messagesList = messagesCol.docs.map(doc => doc.data());
 
-            setMessages(messagesList)
-        }
+        //     setMessages(messagesList)
+        // }
         
-        getData()
+        // getData()
         
-    }, messages);
+    }, [] );
 
     const handleNewMessage = () => {
         try {
@@ -30,18 +31,31 @@ const Messages = (props) => {
             })
             console.log("Document written with ID: ", docRef.id);
             setNewMessage("")
-
-            async () => {
-                const messagesCol = await getDocs(collection(db, 'messages'));
-                const messagesList = messagesCol.docs.map(doc => doc.data());
-    
-                setMessages(messagesList)
-            }
             
         } catch (e) {
             console.error("error adding document: ", e)
         }
     }
+
+    const handleMessagesUpdate = () => {
+        const getMessages = async () => {
+            const messagesCol = await getDocs(query(collection(db, 'messages'), orderBy('createdAt', 'desc'), limit(5)));
+            const messagesList = messagesCol.docs.map(doc => doc.data());
+
+            setMessages(messagesList)
+            setMessagesSent(messagesSent+1);
+        }
+
+        getMessages();
+    }
+
+    const getMessages2 = async () => {
+        // const messagesCol = await getDocs(query(collection(db, 'messages'), orderBy('createdAt', 'desc'), limit(5)));
+        const messagesCol = await query(collection(db, 'messages'), orderBy('createdAt', 'desc'), limit(5));
+        console.log(messagesCol);
+    }
+
+    getMessages2();
 
     const locationHandler = async () => {
         // code to grab location, expo-location
@@ -72,6 +86,9 @@ const Messages = (props) => {
                     />
                 <Pressable onPress={handleNewMessage} style={styles.button}>
                     <Text style={styles.buttonText}>Add Message</Text>
+                </Pressable>
+                <Pressable onPress={handleMessagesUpdate} style={styles.button}>
+                    <Text style={styles.buttonText}>Update Message List</Text>
                 </Pressable>
                 <Pressable onPress={locationHandler} style={styles.geoButton}>
                     <Text style={styles.buttonText}>Get Geo Location</Text>
