@@ -1,33 +1,33 @@
 import { Modal, Pressable, StyleSheet, Text, View, FlatList, TextInput, KeyboardAvoidingView } from 'react-native';
-import React, { useState, useEffect } from 'react';
-import { collection, getDocs, addDoc, Timestamp, query, orderBy, limit } from 'firebase/firestore/lite';
+import React, { useState, useLayoutEffect } from 'react';
+import { collection, getDocs, addDoc, Timestamp, query, orderBy, limit, onSnapshot } from 'firebase/firestore';
 import { db, authentication } from '../firebase';
+import config from '../config'
 import ChatMessage from './ChatMessage';
+import LocationOption from './LocationOption';
 import * as Location from 'expo-location'
+import axios from 'axios';
 
 const Messages = (props) => {
-    const [messages, setMessages] = useState(snapshotMessages);
-    const [messagesSent, setMessagesSent] = useState(0);
+    const [messages, setMessages] = useState([]);
     const [newMessage, setNewMessage] = useState("");
+    const [userLocation, setUserLocation] = useState({});
+    const [modalIsVisible, setModalIsVisible] = useState(false);
+    const [locationsInfo, setLocationsInfo] = useState([{'user_ratings_total': null, 'price_level': null, 'rating': null, 'name': null, 'photos': [{'photo_reference': null}] }]);
 
-    const getMessages2 = async () => {
-        // getDocs => Executes a query and returns the result as a query snapshot
-            // query snapshot = 
-        // collection => Gets a collection reference at a specific path 
-            // In the example below, it gets the collectionRef of "messages" within our firestore instance
-        const messagesCol = await getDocs(query(collection(db, 'messages'), orderBy('createdAt', 'desc'), limit(5)));
-        const messagesList = messagesCol.docs.map(doc => doc.data());
-
-        return messagesList;
-    }
-
-    // Creates global variable that holds messages query snapshot (should change in real time)
-    const snapshotMessages = getMessages2();
-    
-    useEffect(() => {
-        // Do I need to put anything in here?
-        // Just want it to re-render messages when a new message is added to the server
-    }, messages );
+    useLayoutEffect(() => {
+        const q = query(collection(db, "messages"), orderBy('createdAt', 'desc'), limit(5))
+        // Creates snapshot of the last 5 messages in the messages collection
+        const unsubscribe = onSnapshot(q, (snapshot) => {
+            let new5messages = [];
+            snapshot.forEach((doc) => {
+                new5messages.push({'text': doc.data().text})
+            })
+            setMessages(new5messages);
+            // setMessages({last5messages: new5messages});
+        });
+        return unsubscribe
+    }, []);
 
     const handleNewMessage = () => {
         try {
@@ -44,18 +44,6 @@ const Messages = (props) => {
         }
     }
 
-    const handleMessagesUpdate = () => {
-        const getMessages = async () => {
-            const messagesCol = await getDocs(query(collection(db, 'messages'), orderBy('createdAt', 'desc'), limit(5)));
-            const messagesList = messagesCol.docs.map(doc => doc.data());
-
-            setMessages(messagesList)
-            setMessagesSent(messagesSent+1);
-        }
-
-        getMessages();
-    }
-
     const locationHandler = async () => {
         // code to grab location, expo-location
         const location = await (async () => {
@@ -66,8 +54,21 @@ const Messages = (props) => {
             }
             let location = await Location.getCurrentPositionAsync({});
             console.log(location.coords.latitude, location.coords.longitude);
-            return location
+            setUserLocation(location);
         })();
+    };
+
+    const getNearbyLocations = () => {
+        axios.get(`https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${userLocation.coords.latitude}%2C${userLocation.coords.longitude}&radius=1000&type=restaurant&key=${config.GOOGLE_PLACES_API_KEY}`)
+            .then(response => setLocationsInfo(response.data.results));
+    }
+
+    const startLocationModal = () => {
+        setModalIsVisible(true);
+    };
+
+    const endLocationModal = () => {
+        setModalIsVisible(false);
     };
 
     return (
@@ -86,14 +87,18 @@ const Messages = (props) => {
                 <Pressable onPress={handleNewMessage} style={styles.button}>
                     <Text style={styles.buttonText}>Add Message</Text>
                 </Pressable>
-                <Pressable onPress={handleMessagesUpdate} style={styles.button}>
-                    <Text style={styles.buttonText}>Update Message List</Text>
-                </Pressable>
                 <Pressable onPress={locationHandler} style={styles.geoButton}>
                     <Text style={styles.buttonText}>Get Geo Location</Text>
                 </Pressable>
+                <Pressable onPress={getNearbyLocations} style={styles.geoButton}>
+                    <Text style={styles.buttonText}>Get local joints</Text>
+                </Pressable>
+                <Pressable onPress={startLocationModal} style={styles.geoButton}>
+                    <Text style={styles.buttonText}>Photos</Text>
+                </Pressable>
             </View>
             </KeyboardAvoidingView>
+            <LocationOption closeModal={endLocationModal} showModal={modalIsVisible} placesInfo={locationsInfo}/>
             <View style={styles.messagesContainer}>
                 <FlatList data={messages}
                 renderItem={(msgData) => {
