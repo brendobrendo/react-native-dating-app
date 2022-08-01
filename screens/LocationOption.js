@@ -9,7 +9,7 @@ const LocationOption = (props) => {
 
     useEffect(() => {
 
-    }, placeIdx);
+    }, [placeIdx]);
 
     const getNext = () => {
         setPlaceIdx((placeIdx) => placeIdx+1);
