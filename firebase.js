@@ -3,18 +3,19 @@ import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 // import { getFirestore } from 'firebase/firestore/lite';
 import { getFirestore } from 'firebase/firestore'
+import { config } from "./config"
 
 
 
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyA9eaIf7MgBVOgbDpTy5NR2eTTWoMds_u8",
+  apiKey: config.FIREBASE_API_KEY,
   authDomain: "dating-app-auth.firebaseapp.com",
   projectId: "dating-app-auth",
   storageBucket: "dating-app-auth.appspot.com",
-  messagingSenderId: "839288156860",
-  appId: "1:839288156860:web:aede34c623b5c0f54d96b9"
+  messagingSenderId: config.FIREBASE_MESSAGING_SENDER_ID,
+  appId: config.APP_ID
 };
 
 // Initialize Firebase

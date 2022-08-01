@@ -1,6 +1,6 @@
 import { Modal, Pressable, StyleSheet, Text, View, FlatList, TextInput, KeyboardAvoidingView } from 'react-native';
 import React, { useState, useLayoutEffect } from 'react';
-import { collection, getDocs, addDoc, Timestamp, query, orderBy, limit, onSnapshot } from 'firebase/firestore';
+import { collection, addDoc, Timestamp, query, orderBy, limit, onSnapshot } from 'firebase/firestore';
 import { db, authentication } from '../firebase';
 import config from '../config'
 import ChatMessage from './ChatMessage';
