@@ -19,7 +19,6 @@ const HomeScreen = () => {
   const handleSignOut = () => {
     signOut(authentication)
       .then(() => {
-        closeUser();
         navigation.replace("Login");
       })
       .catch(error => alert(error.message))
@@ -64,7 +63,7 @@ const HomeScreen = () => {
         </Pressable>
         <Text style={styles.messagenumber}>10</Text>
         <Pressable onPress={openuser}>
-          <Image style={styles.image} source={require('../assets/images/profileicon.png')} />
+          <Image style={styles.image} source={require('../assets/images/profileicon.jpg')} />
         </Pressable>
       </View>
 
