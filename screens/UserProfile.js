@@ -2,8 +2,8 @@ import { StyleSheet, Text, View, Modal, Pressable, Image, Alert, TextInput, Keyb
 import React, { useEffect, useState } from 'react';
 import * as imagePicker from "expo-image-picker"
 import { ref, uploadBytes, getStorage, deleteObject, getDownloadURL } from "firebase/storage"
-import { authentication, updateProfile, db } from '../firebase';
-import { collection, addDoc, updateDoc, doc, DocumentReference, getDoc, query, where } from 'firebase/firestore/lite';
+import { authentication, db, updateProfile} from '../firebase';
+import { updateDoc, query, where, getDocs, collection } from 'firebase/firestore';
 import { Menu, MenuOptions, MenuOption, MenuTrigger, MenuProvider, renderers } from 'react-native-popup-menu';
 
 
@@ -16,27 +16,19 @@ const UserProfile = (props) => {
     const useremail = authentication.currentUser.email
 
 
-    const handleUpdate = () => {
+    const handleUpdate = async () => {
         if (parseInt(age) < 18) {
             alert("cant be under 18")
             return
         }
-        // try {
-        //     const userRef = updateDoc(collection(db, "UserInfo", "jYTNlNZNoeOPYAoptpIiOVnxlYq1"), {
-        //         Uid: authentication.currentUser.uid,
-        //         age: age,
-        //         gender: gender
-        //     })
-        //     console.log("user info updated?")
-
-        // } catch (e) {
-        //     console.error("error adding info: ", e)
-        // }
-
-        const userRef = getDoc(query(collection(db, 'UserInfo'), where("Uid", "==", "jYTNlNZNoeOPYAoptpIiOVnxlYq1")))
-        updateDoc(userRef, {
-            age: age,
-            gender: gender
+        const q = query(collection(db, "UserInfo"), where("Uid", "==", authentication.currentUser.uid))
+        const querysnap = await getDocs(q)
+        querysnap.forEach((doc) => {
+            // console.log(doc.id, "=>", doc.data())
+            updateDoc(doc.ref, {
+                age: age,
+                gender: gender
+            })
         })
     }
 
@@ -64,6 +56,9 @@ const UserProfile = (props) => {
             const bytes = await img.blob();
 
             uploadBytes(reference, bytes);
+            updateProfile(authentication.currentUser, {
+                photoURL: url
+            })
             console.log("uploaded profile pic")
         }
         setPfupdate(Math.random());
@@ -86,6 +81,10 @@ const UserProfile = (props) => {
             const bytes = await img.blob();
 
             uploadBytes(reference, bytes);
+            updateProfile(authentication.currentUser, {
+                photoURL: url
+            })
+
             console.log("uploaded profile pic")
         }
         setPfupdate(Math.random());
@@ -112,91 +111,94 @@ const UserProfile = (props) => {
             .catch((err) => {
                 alert("error deleting at this time")
             })
+            updateProfile(authentication.currentUser, {
+                photoURL: null
+            })
         setPfupdate(Math.random());
     }
 
     return (
-            <Modal visible={props.isVisible} animationType="slide">
-                <MenuProvider>
-                    <View style={styles.container}>
+        <Modal visible={props.isVisible} animationType="slide">
+            <MenuProvider>
+                <View style={styles.container}>
 
-                        <View style={styles.username}>
-                            <Text style={styles.fontSize}>
-                                {useremail}'s
-                                {"\n"}
-                                Profile
+                    <View style={styles.username}>
+                        <Text style={styles.fontSize}>
+                            {useremail}'s
+                            {"\n"}
+                            Profile
 
-                            </Text>
+                        </Text>
+                    </View>
+
+                    <View style={styles.info}>
+                        <Menu renderer={renderers.SlideInMenu}>
+                            <MenuTrigger>
+                                {url ? <Image style={styles.image} source={{ uri: url }} />
+                                    : <Image style={styles.image} source={require('../assets/images/profileicon.jpg')} />
+                                }
+                            </MenuTrigger>
+                            <MenuOptions>
+                                <MenuOption onSelect={pickImage}>
+                                    <Text style={styles.pfpoptions}>Take a photo</Text>
+                                </MenuOption>
+
+                                <MenuOption onSelect={pickGallery}>
+                                    <Text style={styles.pfpoptions}>Select an image from Gallery</Text>
+                                </MenuOption>
+
+                                <MenuOption onSelect={deleteImage}>
+                                    <Text style={styles.pfpoptions}>Delete your profile picture</Text>
+                                </MenuOption>
+                            </MenuOptions>
+                        </Menu>
+
+                        <View style={styles.inRow}>
+                            <Text style={styles.fontSize}>Age: </Text>
+                            <TextInput style={styles.fontSize}
+                                placeholder={age}
+                                value={age}
+                                onChangeText={text => setAge(text)}>
+                            </TextInput>
                         </View>
 
-                        <View style={styles.info}>
-                            <Menu renderer={renderers.SlideInMenu}>
-                                <MenuTrigger>
-                                    {url ? <Image style={styles.image} source={{ uri: url }} />
-                                        : <Image style={styles.image} source={require('../assets/images/profileicon.jpg')} />
-                                    }
-                                </MenuTrigger>
-                                <MenuOptions>
-                                    <MenuOption onSelect={pickImage}>
-                                        <Text style={styles.pfpoptions}>Take a photo</Text>
-                                    </MenuOption>
-
-                                    <MenuOption onSelect={pickGallery}>
-                                        <Text style={styles.pfpoptions}>Select an image from Gallery</Text>
-                                    </MenuOption>
-
-                                    <MenuOption onSelect={deleteImage}>
-                                        <Text style={styles.pfpoptions}>Delete your profile picture</Text>
-                                    </MenuOption>
-                                </MenuOptions>
-                            </Menu>
-
-                            <View style={styles.inRow}>
-                                <Text style={styles.fontSize}>Age: </Text>
-                                <TextInput style={styles.fontSize}
-                                    placeholder={age}
-                                    value={age}
-                                    onChangeText={text => setAge(text)}>
-                                </TextInput>
-                            </View>
-
-                            <Menu>
-                                <MenuTrigger>
-                                    <Text style={styles.fontSize}>
-                                        Gender: {gender}
-                                    </Text>
-                                </MenuTrigger>
-                                <MenuOptions>
-                                    <MenuOption onSelect={() => setGender("male")}>
-                                        <Text>Male</Text>
-                                    </MenuOption>
-                                    <MenuOption onSelect={() => setGender("female")}>
-                                        <Text>Female</Text>
-                                    </MenuOption>
-                                </MenuOptions>
-                            </Menu>
-
-                            <Pressable style={styles.button} onPress={handleUpdate}>
-                                <Text style={styles.buttonText}>Update Info</Text>
-                            </Pressable>
-
-                            <Pressable style={styles.button}
-                                onPress={props.closeUser}>
-                                <Text style={styles.buttonText}>
-                                    Exit
+                        <Menu>
+                            <MenuTrigger>
+                                <Text style={styles.fontSize}>
+                                    Gender: {gender}
                                 </Text>
-                            </Pressable>
-                        </View>
+                            </MenuTrigger>
+                            <MenuOptions>
+                                <MenuOption onSelect={() => setGender("male")}>
+                                    <Text>Male</Text>
+                                </MenuOption>
+                                <MenuOption onSelect={() => setGender("female")}>
+                                    <Text>Female</Text>
+                                </MenuOption>
+                            </MenuOptions>
+                        </Menu>
 
-                        <Pressable
-                            onPress={props.signOut}
-                            style={styles.button}
-                        >
-                            <Text style={styles.buttonText}>Sign out</Text>
+                        <Pressable style={styles.button} onPress={handleUpdate}>
+                            <Text style={styles.buttonText}>Update Info</Text>
+                        </Pressable>
+
+                        <Pressable style={styles.button}
+                            onPress={props.closeUser}>
+                            <Text style={styles.buttonText}>
+                                Exit
+                            </Text>
                         </Pressable>
                     </View>
-                </MenuProvider>
-            </Modal>
+
+                    <Pressable
+                        onPress={props.signOut}
+                        style={styles.button}
+                    >
+                        <Text style={styles.buttonText}>Sign out</Text>
+                    </Pressable>
+                </View>
+            </MenuProvider>
+        </Modal>
     )
 }
 
