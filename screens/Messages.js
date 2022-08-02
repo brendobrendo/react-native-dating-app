@@ -1,6 +1,6 @@
 import { Modal, Pressable, StyleSheet, Text, View, FlatList, TextInput, KeyboardAvoidingView } from 'react-native';
 import React, { useState, useLayoutEffect } from 'react';
-import { collection, addDoc, Timestamp, query, orderBy, limit, onSnapshot } from 'firebase/firestore';
+import { collection, addDoc, Timestamp, query, orderBy, limit, onSnapshot, where, getDocs } from 'firebase/firestore';
 import { db, authentication } from '../firebase';
 import config from '../config'
 import ChatMessage from './components/ChatMessage';
@@ -95,6 +95,9 @@ const Messages = (props) => {
                 </Pressable>
                 <Pressable onPress={startLocationModal} style={styles.geoButton}>
                     <Text style={styles.buttonText}>Photos</Text>
+                </Pressable>
+                <Pressable onPress={getUserIds} style={styles.geoButton}>
+                    <Text style={styles.buttonText}>User Ids</Text>
                 </Pressable>
             </View>
             </KeyboardAvoidingView>
