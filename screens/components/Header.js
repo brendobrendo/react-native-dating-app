@@ -44,12 +44,12 @@ const Header = (props) => {
 
             {/* top buttons */}
             <View style={styles.row}>
+                <Pressable onPress={openuser}>
+                    <Image style={styles.image} source={require('../../assets/images/profileicon.png')} />
+                </Pressable>
+
                 <Pressable onPress={openMessages}>
                     <Image style={styles.image} source={require('../../assets/images/messageicon.png')} />
-                </Pressable>
-                <Text>10</Text>
-                <Pressable onPress={openuser}>
-                    <Image style={styles.image} source={require('../../assets/images/profileicon.jpg')} />
                 </Pressable>
             </View>
         </View>
@@ -63,10 +63,16 @@ const styles = StyleSheet.create({
         marginTop: 30
     },
     row: {
-        flexDirection: "row"
+        flexDirection: "row",
+        width: "100%",
+        justifyContent: "space-between",
+        borderColor: "gray",
+        borderBottomWidth: 2,
+        paddingBottom: 15
     },
     image: {
         width: 40,
-        height: 40
+        height: 40,
+        marginHorizontal: 30
     }
 })

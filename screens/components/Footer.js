@@ -55,7 +55,7 @@ const styles = StyleSheet.create({
         borderColor: "gray",
         borderTopWidth: 2,
         justifyContent: "space-around",
-        marginBottom: 10,
+        marginBottom: 15,
         paddingTop: 15
     },
     image: {
