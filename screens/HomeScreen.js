@@ -51,11 +51,14 @@ const HomeScreen = () => {
   return (
     <View style={styles.container}>
       <Header />
+
       <View style={styles.body}>
-        <Text>{booktest}</Text>
-        <Text style={styles.temp}>Email: {authentication.currentUser?.email}</Text>
+
+        <Text>Email: {authentication.currentUser?.email}</Text>
+
       </View>
-      <Footer style={styles.flex}/>
+
+      <Footer style={styles.flex} />
     </View>
   )
 }
@@ -65,45 +68,11 @@ export default HomeScreen
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
-  flex: {
-    flex: 1
-  },
-  header: {
-    paddingTop: 30,
-    alignSelf: "flex-end",
-    flexDirection: "row",
   },
   body: {
-    flex: 1
-  },
-  image: {
-    width: 40,
-    height: 40,
-    margin: 5
-  },
-  button: {
-    backgroundColor: '#0782F9',
-    width: '60%',
-    padding: 15,
-    borderRadius: 10,
-    alignItems: 'center',
-    marginTop: 40,
-  },
-  buttonText: {
-    color: 'white',
-    fontWeight: '700',
-    fontSize: 16,
-  },
-  messagenumber: {
-    color: "#0782F9",
-    marginLeft: -15,
-    fontSize: 20,
-    backgroundColor: "lightblue",
-    height: 30,
-    paddingHorizontal: 5,
-    borderRadius: 20
+    flex: 1,
+    width: "100%",
+    justifyContent: "center",
+    alignItems: "center"
   }
 })

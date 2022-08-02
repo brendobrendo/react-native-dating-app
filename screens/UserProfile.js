@@ -135,7 +135,7 @@ const UserProfile = (props) => {
                         <Menu renderer={renderers.SlideInMenu}>
                             <MenuTrigger>
                                 {url ? <Image style={styles.image} source={{ uri: url }} />
-                                    : <Image style={styles.image} source={require('../assets/images/profileicon.jpg')} />
+                                    : <Image style={styles.image} source={require('../assets/images/profileicon.png')} />
                                 }
                             </MenuTrigger>
                             <MenuOptions>
