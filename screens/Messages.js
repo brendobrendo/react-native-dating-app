@@ -96,9 +96,6 @@ const Messages = (props) => {
                 <Pressable onPress={startLocationModal} style={styles.geoButton}>
                     <Text style={styles.buttonText}>Photos</Text>
                 </Pressable>
-                <Pressable onPress={getUserIds} style={styles.geoButton}>
-                    <Text style={styles.buttonText}>User Ids</Text>
-                </Pressable>
             </View>
             </KeyboardAvoidingView>
             <LocationOption closeModal={endLocationModal} showModal={modalIsVisible} placesInfo={locationsInfo}/>
