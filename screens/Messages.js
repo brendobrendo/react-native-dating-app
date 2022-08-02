@@ -3,7 +3,7 @@ import React, { useState, useLayoutEffect } from 'react';
 import { collection, addDoc, Timestamp, query, orderBy, limit, onSnapshot } from 'firebase/firestore';
 import { db, authentication } from '../firebase';
 import config from '../config'
-import ChatMessage from './ChatMessage';
+import ChatMessage from './components/ChatMessage';
 import LocationOption from './LocationOption';
 import * as Location from 'expo-location'
 import axios from 'axios';

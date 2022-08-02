@@ -1,44 +1,16 @@
 import { StyleSheet, Text, View, Pressable, Image } from 'react-native'
 import React, { useEffect, useState } from 'react'
-import { useNavigation } from '@react-navigation/core'
-import { authentication } from '../firebase'
-import UserProfile from './UserProfile'
-import Messages from './Messages'
+import { authentication, db } from '../firebase'
 import axios from 'axios'
 import { ApiRoot, ApiTest } from "./Api";
-import { signOut } from 'firebase/auth';
+import { query, where, getDocs, collection, addDoc } from 'firebase/firestore';
+import Header from './components/Header'
+import Footer from './components/Footer';
 
 
 
 const HomeScreen = () => {
 
-  const [userModal, setUserModal] = useState(false);
-  const [messagesModal, setMessagesModal] = useState(false);
-  const navigation = useNavigation()
-
-  const handleSignOut = () => {
-    signOut(authentication)
-      .then(() => {
-        navigation.replace("Login");
-      })
-      .catch(error => alert(error.message))
-  }
-
-  const closeUser = () => {
-    setUserModal(false)
-  }
-
-  const openuser = () => {
-    setUserModal(true)
-  }
-
-  const closeMessages = () => {
-    setMessagesModal(false)
-  }
-
-  const openMessages = () => {
-    setMessagesModal(true)
-  }
   const [booktest, setbooktest] = useState("")
 
   useEffect(() => {
@@ -50,27 +22,40 @@ const HomeScreen = () => {
       .catch((err) => console.log(err))
   }, [])
 
+
+  // adding base user info to db if none exists
+  useEffect(() => {
+    const checkUser = async () => {
+      const q = query(collection(db, "UserInfo"), where("Uid", "==", authentication.currentUser.uid))
+      const querysnap = await getDocs(q)
+      console.log("checkinguser")
+      if (querysnap.empty) {
+        console.log("nothing here yet, lets fix that")
+        const docRef = await addDoc(collection(db, "UserInfo"), {
+          Uid: authentication.currentUser.uid,
+          age: null,
+          gender: null,
+          likedAt: null,
+          places: []
+        })
+      }
+      else {
+        querysnap.forEach((doc) => {
+          console.log(doc.id, "=>", doc.data())
+        })
+      }
+    }
+    checkUser();
+  }, [])
+
   return (
     <View style={styles.container}>
-      {/* modals */}
-      <UserProfile isVisible={userModal} closeUser={closeUser} signOut={handleSignOut}/>
-      <Messages visible={messagesModal} closeMessages={closeMessages} />
-
-      {/* top buttons */}
-      <View style={styles.header}>
-        <Pressable onPress={openMessages}>
-          <Image style={styles.image} source={require('../assets/images/messageicon.png')} />
-        </Pressable>
-        <Text style={styles.messagenumber}>10</Text>
-        <Pressable onPress={openuser}>
-          <Image style={styles.image} source={require('../assets/images/profileicon.jpg')} />
-        </Pressable>
-      </View>
-
+      <Header />
       <View style={styles.body}>
         <Text>{booktest}</Text>
         <Text style={styles.temp}>Email: {authentication.currentUser?.email}</Text>
       </View>
+      <Footer style={styles.flex}/>
     </View>
   )
 }
@@ -83,12 +68,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center'
   },
+  flex: {
+    flex: 1
+  },
   header: {
     paddingTop: 30,
     alignSelf: "flex-end",
     flexDirection: "row",
-    // borderColor: "red",
-    // borderWidth: 1,
   },
   body: {
     flex: 1
