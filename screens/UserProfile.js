@@ -1,10 +1,11 @@
-import { StyleSheet, Text, View, Modal, Pressable, Image, Alert, TextInput, KeyboardAvoidingView } from 'react-native';
+import { StyleSheet, Text, View, Modal, Pressable, Image, Alert, TextInput } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import * as imagePicker from "expo-image-picker"
 import { ref, uploadBytes, getStorage, deleteObject, getDownloadURL } from "firebase/storage"
-import { authentication, db, updateProfile} from '../firebase';
+import { authentication, db, updateProfile } from '../firebase';
 import { updateDoc, query, where, getDocs, collection } from 'firebase/firestore';
 import { Menu, MenuOptions, MenuOption, MenuTrigger, MenuProvider, renderers } from 'react-native-popup-menu';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 
 const UserProfile = (props) => {
@@ -12,10 +13,12 @@ const UserProfile = (props) => {
     const [url, setUrl] = useState("")
     const [age, setAge] = useState("18")
     const [gender, setGender] = useState("")
+    const [story, setStory] = useState("")
     const [pfupdate, setPfupdate] = useState(0)
     const useremail = authentication.currentUser.email
 
 
+    // updates a users profile
     const handleUpdate = async () => {
         if (parseInt(age) < 18) {
             alert("cant be under 18")
@@ -27,11 +30,13 @@ const UserProfile = (props) => {
             // console.log(doc.id, "=>", doc.data())
             updateDoc(doc.ref, {
                 age: age,
-                gender: gender
+                gender: gender,
+                bio: bio
             })
         })
     }
 
+    // sets the profile pic url by getting the users pfp from db storage, and updating on state change
     useEffect(() => {
         const store = getStorage();
         setTimeout(() =>
@@ -40,6 +45,7 @@ const UserProfile = (props) => {
             , 1000)
     }, [pfupdate])
 
+    // opens camera app to take pic to upload as pfp
     const pickImage = async () => {
         let result = await imagePicker.launchCameraAsync({
             mediaTypes: imagePicker.MediaTypeOptions.Images,
@@ -65,6 +71,7 @@ const UserProfile = (props) => {
         console.log(pfupdate)
     }
 
+    // opens gallery to select pic to upload as pfp
     const pickGallery = async () => {
         let result = await imagePicker.launchImageLibraryAsync({
             mediaTypes: imagePicker.MediaTypeOptions.Images,
@@ -91,6 +98,7 @@ const UserProfile = (props) => {
         console.log(pfupdate)
     }
 
+    // asks user to confirm deletion of pfp from storage
     const deleteImage = () => {
         Alert.alert(
             "Delete profile pic?",
@@ -104,6 +112,7 @@ const UserProfile = (props) => {
             ]
         )
     }
+    // deletes users pfp from storage
     const deleteImageResponse = async () => {
         const store = getStorage();
         const reference = ref(store, `profile-${useremail}.jpg`);
@@ -111,93 +120,113 @@ const UserProfile = (props) => {
             .catch((err) => {
                 alert("error deleting at this time")
             })
-            updateProfile(authentication.currentUser, {
-                photoURL: null
-            })
+        updateProfile(authentication.currentUser, {
+            photoURL: null
+        })
         setPfupdate(Math.random());
     }
 
     return (
         <Modal visible={props.isVisible} animationType="slide">
-            <MenuProvider>
-                <View style={styles.container}>
+            <KeyboardAwareScrollView>
+                <MenuProvider>
+                    <View style={styles.container}>
 
-                    <View style={styles.username}>
-                        <Text style={styles.fontSize}>
-                            {useremail}'s
-                            {"\n"}
-                            Profile
+                        <View style={styles.section1}>
+                            {/* pfp seslection menu */}
+                            <Menu renderer={renderers.SlideInMenu}>
+                                <MenuTrigger>
+                                    {url ? <Image style={styles.image} source={{ uri: url }} />
+                                        : <Image style={styles.image} source={require('../assets/images/profileicon.png')} />
+                                    }
+                                </MenuTrigger>
+                                <MenuOptions>
+                                    <MenuOption onSelect={pickImage}>
+                                        <Text style={styles.pfpoptions}>Take a photo</Text>
+                                    </MenuOption>
 
-                        </Text>
-                    </View>
+                                    <MenuOption onSelect={pickGallery}>
+                                        <Text style={styles.pfpoptions}>Select an image from Gallery</Text>
+                                    </MenuOption>
 
-                    <View style={styles.info}>
-                        <Menu renderer={renderers.SlideInMenu}>
-                            <MenuTrigger>
-                                {url ? <Image style={styles.image} source={{ uri: url }} />
-                                    : <Image style={styles.image} source={require('../assets/images/profileicon.png')} />
-                                }
-                            </MenuTrigger>
-                            <MenuOptions>
-                                <MenuOption onSelect={pickImage}>
-                                    <Text style={styles.pfpoptions}>Take a photo</Text>
-                                </MenuOption>
+                                    <MenuOption onSelect={deleteImage}>
+                                        <Text style={styles.pfpoptions}>Delete your profile picture</Text>
+                                    </MenuOption>
+                                </MenuOptions>
+                            </Menu>
 
-                                <MenuOption onSelect={pickGallery}>
-                                    <Text style={styles.pfpoptions}>Select an image from Gallery</Text>
-                                </MenuOption>
-
-                                <MenuOption onSelect={deleteImage}>
-                                    <Text style={styles.pfpoptions}>Delete your profile picture</Text>
-                                </MenuOption>
-                            </MenuOptions>
-                        </Menu>
-
-                        <View style={styles.inRow}>
-                            <Text style={styles.fontSize}>Age: </Text>
-                            <TextInput style={styles.fontSize}
-                                placeholder={age}
-                                value={age}
-                                onChangeText={text => setAge(text)}>
-                            </TextInput>
+                            <Text style={styles.username}>
+                                {useremail}'s
+                                {"\n"}
+                                Profile
+                            </Text>
                         </View>
 
-                        <Menu>
-                            <MenuTrigger>
-                                <Text style={styles.fontSize}>
-                                    Gender: {gender}
-                                </Text>
-                            </MenuTrigger>
-                            <MenuOptions>
-                                <MenuOption onSelect={() => setGender("male")}>
-                                    <Text>Male</Text>
-                                </MenuOption>
-                                <MenuOption onSelect={() => setGender("female")}>
-                                    <Text>Female</Text>
-                                </MenuOption>
-                            </MenuOptions>
-                        </Menu>
+                        <View style={styles.stats}>
+                            <Text style={styles.bigtext}>
+                                My Stats:
+                            </Text>
+                            {/* age input */}
+                            <View style={styles.inRow}>
+                                <Text style={styles.fontSize}>Age: </Text>
+                                <TextInput style={styles.fontSize}
+                                    placeholder={age}
+                                    value={age}
+                                    onChangeText={text => setAge(text)}>
+                                </TextInput>
+                            </View>
+
+                            {/* gender slection menu */}
+                            <Menu>
+                                <MenuTrigger>
+                                    <Text style={styles.fontSize}>
+                                        Gender: {gender}
+                                    </Text>
+                                </MenuTrigger>
+                                <MenuOptions customStyles={optionsStyles}>
+                                    <MenuOption onSelect={() => setGender("male")}>
+                                        <Text style={{ fontSize: 25 }}>Male</Text>
+                                    </MenuOption>
+                                    <MenuOption onSelect={() => setGender("female")}>
+                                        <Text style={{ fontSize: 25 }}>Female</Text>
+                                    </MenuOption>
+                                </MenuOptions>
+                            </Menu>
+
+                            <Text style={styles.bigtext}>
+                                My Story:
+                            </Text>
+
+
+                            <View style={styles.inRow}>
+                                <TextInput style={styles.story}
+                                    multiline
+                                    placeholder='max char limit of 250'
+                                    value={story}
+                                    onChange={text => setStory(text)}>
+                                </TextInput>
+                            </View>
+
+                        </View>
 
                         <Pressable style={styles.button} onPress={handleUpdate}>
                             <Text style={styles.buttonText}>Update Info</Text>
                         </Pressable>
 
-                        <Pressable style={styles.button}
+                        <Pressable
+                            style={styles.button}
                             onPress={props.closeUser}>
-                            <Text style={styles.buttonText}>
-                                Exit
-                            </Text>
+                            <Text style={styles.buttonText}>Back</Text>
+                        </Pressable>
+
+                        <Pressable
+                            style={styles.button}
+                            onPress={props.signOut}>
+                            <Text style={styles.buttonText}>Logout</Text>
                         </Pressable>
                     </View>
-
-                    <Pressable
-                        onPress={props.signOut}
-                        style={styles.button}
-                    >
-                        <Text style={styles.buttonText}>Sign out</Text>
-                    </Pressable>
-                </View>
-            </MenuProvider>
+                </MenuProvider>
+            </KeyboardAwareScrollView>
         </Modal>
     )
 }
@@ -207,29 +236,45 @@ export default UserProfile
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        justifyContent: 'center',
         alignItems: 'center',
-        paddingVertical: 50,
+        marginTop: 20
+    },
+    section1: {
+        flexDirection: "row",
+        width: "100%",
+        alignItems: "center"
+    },
+    image: {
+        width: 150,
+        height: 150,
+        margin: 15,
+        borderRadius: 30
     },
     username: {
-        flex: 1,
-    },
-    fontSize: {
         fontSize: 20,
         textAlign: "center"
+    },
+    stats: {
+        width: "80%"
+    },
+    fontSize: {
+        fontSize: 30,
+    },
+    bigtext: {
+        fontSize: 30,
+        marginBottom: 15,
+        fontWeight: "bold"
     },
     inRow: {
         flexDirection: "row"
     },
-    image: {
-        width: 100,
-        height: 100,
-        margin: 20,
-        borderRadius: 30
-    },
-    info: {
-        flex: 4,
-        alignItems: "center"
+    story: {
+        width: "100%",
+        height: 150,
+        fontSize: 20,
+        borderColor: "gray",
+        borderWidth: 1,
+        textAlignVertical: "top",
     },
     button: {
         backgroundColor: '#0782F9',
@@ -251,5 +296,15 @@ const styles = StyleSheet.create({
         color: "white",
         backgroundColor: "blue",
         paddingVertical: 5
+    },
+    test: {
+        // borderColor: "red",
+        // borderWidth: 1
     }
 })
+
+const optionsStyles = {
+    optionWrapper: {
+        backgroundColor: 'lightblue',
+    },
+};
