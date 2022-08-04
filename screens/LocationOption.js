@@ -10,20 +10,6 @@ const LocationOption = () => {
     const [modalIsVisible, setModalIsVisible] = useState(false);
     const [locationsInfo, setLocationsInfo] = useState([{'user_ratings_total': null, 'price_level': null, 'rating': null, 'name': null, 'photos': [{'photo_reference': null}] }]);
 
-    const locationHandler = async () => {
-        // code to grab location, expo-location
-        const location = await (async () => {
-            let { status } = await Location.requestForegroundPermissionsAsync();
-            if (status !== 'granted') {
-                setErrorMsg('Permission to access location was denied');
-                return;
-            }
-            let location = await Location.getCurrentPositionAsync({});
-            console.log(location.coords.latitude, location.coords.longitude);
-            setUserLocation(location);
-        })();
-    };
-
     const getNearbyLocations = () => {
         axios.get(`https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${userLocation.coords.latitude}%2C${userLocation.coords.longitude}&radius=1000&type=restaurant&key=${config.GOOGLE_PLACES_API_KEY}`)
             .then(response => setLocationsInfo(response.data.results));
