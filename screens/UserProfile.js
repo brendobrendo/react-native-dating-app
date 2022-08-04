@@ -24,6 +24,10 @@ const UserProfile = (props) => {
             alert("cant be under 18")
             return
         }
+        else if (isNaN(age)){
+            alert("only valid numbers are acepted for age")
+            return
+        }
         const q = query(collection(db, "UserInfo"), where("Uid", "==", authentication.currentUser.uid))
         const querysnap = await getDocs(q)
         querysnap.forEach((doc) => {
@@ -31,7 +35,7 @@ const UserProfile = (props) => {
             updateDoc(doc.ref, {
                 age: age,
                 gender: gender,
-                bio: bio
+                story: story
             })
         })
     }
@@ -196,7 +200,6 @@ const UserProfile = (props) => {
                             <Text style={styles.bigtext}>
                                 My Story:
                             </Text>
-
 
                             <View style={styles.inRow}>
                                 <TextInput style={styles.story}
