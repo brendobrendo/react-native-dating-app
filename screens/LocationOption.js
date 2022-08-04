@@ -1,115 +1,102 @@
-import { StyleSheet, Image, Modal, Pressable, Text, View } from 'react-native'
-import React, { useState, useEffect } from 'react';
-import config from '../config'
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+import React, { useState } from 'react';
+import config from '../config';
+import * as Location from 'expo-location';
+import axios from 'axios';
 
-const LocationOption = (props) => {
-    const [placeIdx, setPlaceIdx] = useState(0);
+const LocationOption = () => {
 
-    let place = props.placesInfo[placeIdx]
+    const [userLocation, setUserLocation] = useState({});
+    const [modalIsVisible, setModalIsVisible] = useState(false);
+    const [locationsInfo, setLocationsInfo] = useState([{'user_ratings_total': null, 'price_level': null, 'rating': null, 'name': null, 'photos': [{'photo_reference': null}] }]);
 
-    useEffect(() => {
-
-    }, [placeIdx]);
-
-    const getNext = () => {
-        setPlaceIdx((placeIdx) => placeIdx+1);
+    const locationHandler = async () => {
+        // code to grab location, expo-location
+        const location = await (async () => {
+            let { status } = await Location.requestForegroundPermissionsAsync();
+            if (status !== 'granted') {
+                setErrorMsg('Permission to access location was denied');
+                return;
+            }
+            let location = await Location.getCurrentPositionAsync({});
+            console.log(location.coords.latitude, location.coords.longitude);
+            setUserLocation(location);
+        })();
     };
 
-    const getPrev = () => {
-        setPlaceIdx((placeIdx) => placeIdx-1);
+    const getNearbyLocations = () => {
+        axios.get(`https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${userLocation.coords.latitude}%2C${userLocation.coords.longitude}&radius=1000&type=restaurant&key=${config.GOOGLE_PLACES_API_KEY}`)
+            .then(response => setLocationsInfo(response.data.results));
+    }
+
+    const startLocationModal = () => {
+        setModalIsVisible(true);
     };
 
+    const endLocationModal = () => {
+        setModalIsVisible(false);
+    };
+    
     return (
-        <Modal visible={props.showModal} style={styles.modalContainer}>
-            <View style={styles.imageContainer}>
-                <Text style={styles.restaurantTitle}>{place.name}</Text>
-                <Image style={styles.image} source={{ uri: `https://maps.googleapis.com/maps/api/place/photo?maxwidth=600&maxheight=802&photo_reference=${place.photos[0]['photo_reference']}&key=${config.GOOGLE_PLACES_API_KEY}`, }} />
-                <Text style={styles.restaurantInfo}>Rating: {place['rating']}</Text>
-                <Text style={styles.restaurantInfo}>Total Ratings: {place['user_ratings_total']}</Text>
-                <Text style={styles.restaurantInfo}>Price Level: {place['price_level']}</Text>
-            </View>
-            <View style={styles.buttonContainer}>
-                <View style={styles.toggleButtonContainer}>
-                    <Pressable onPress={getPrev} style={styles.prevButton}>
-                        <Text style={styles.buttonText}>Previous</Text>
-                    </Pressable>
-                    <Pressable onPress={getNext} style={styles.nextButton}>
-                        <Text style={styles.buttonText}>Next</Text>
-                    </Pressable>
-                </View>
-                <Pressable onPress={props.closeModal} style={styles.button}>
-                    <Text style={styles.buttonText}>Close Modal</Text>
-                </Pressable>
-            </View>
-        </Modal>
+        <View>
+            <Pressable onPress={locationHandler} style={styles.geoButton}>
+                <Text style={styles.buttonText}>Get Geo Location</Text>
+            </Pressable>
+            <Pressable onPress={getNearbyLocations} style={styles.geoButton}>
+                <Text style={styles.buttonText}>Get local joints</Text>
+            </Pressable>
+            <Pressable onPress={startLocationModal} style={styles.geoButton}>
+                <Text style={styles.buttonText}>Photos</Text>
+            </Pressable>
+            <LocationOption closeModal={endLocationModal} showModal={modalIsVisible} placesInfo={locationsInfo}/>
+        </View>
     )
 }
 
 export default LocationOption
 
 const styles = StyleSheet.create({
-    modalContainer: {
+    container: {
         flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center'
     },
     button: {
         backgroundColor: '#0782F9',
-        width: 350,
+        width: '80%',
         padding: 15,
         borderRadius: 10,
         alignItems: 'center',
-        marginTop: 20,
+        marginTop: 40,
     },
     buttonText: {
         color: 'white',
         fontWeight: '700',
         fontSize: 16,
-    },
-    image: {
-        height: 350,
-        width: 350,
-        marginTop: 50,
-        borderRadius: 30,
-    },
-    imageContainer: {
+      },
+      buttonContainer: {
         justifyContent: 'center',
         alignItems: 'center',
-    },
-    buttonContainer: {
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    restaurantTitle: {
-        color: 'black',
-        fontWeight: '700',
-        fontSize: 35,
-        marginTop: 75,
-    },
-    restaurantInfo: {
-        color: 'black',
-        fontWeight: '700',
-        fontSize: 15,
-        marginTop: 20,
-    },
-    toggleButtonContainer: {
-        justifyContent: 'center',
-        alignItems: 'center',
-        flexDirection: "row",
-    },
-    prevButton: {
-        backgroundColor: '#4B0082',
-        width: 160,
+      },
+      messagesContainer: {
+        marginTop: 40,
+      },
+      geoButton: {
+        backgroundColor: 'green',
+        width: '80%',
         padding: 15,
         borderRadius: 10,
-        marginTop: 20,
-        marginRight: 30,
         alignItems: 'center',
-    },
-    nextButton: {
-        backgroundColor: '#9932CC',
-        width: 160,
-        padding: 15,
+        marginTop: 40,
+      },
+      input: {
+        backgroundColor: 'white',
+        paddingHorizontal: 15,
+        paddingVertical: 10,
         borderRadius: 10,
-        marginTop: 20,
-        alignItems: 'center',
-    }
+        marginTop: 10,
+        borderWidth: 1,
+        borderColor: "grey",
+        width: '80%',
+    },
 })
