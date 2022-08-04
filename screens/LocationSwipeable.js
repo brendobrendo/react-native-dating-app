@@ -20,7 +20,7 @@ const LocationSwipeable = (props) => {
     };
 
     return (
-        <Modal visible={props.showModal} style={styles.modalContainer}>
+        <Modal visible={props.showLocationModal} style={styles.modalContainer}>
             <View style={styles.imageContainer}>
                 <Text style={styles.restaurantTitle}>{place.name}</Text>
                 <Image style={styles.image} source={{ uri: `https://maps.googleapis.com/maps/api/place/photo?maxwidth=600&maxheight=802&photo_reference=${place.photos[0]['photo_reference']}&key=${config.GOOGLE_PLACES_API_KEY}`, }} />
@@ -37,7 +37,7 @@ const LocationSwipeable = (props) => {
                         <Text style={styles.buttonText}>Next</Text>
                     </Pressable>
                 </View>
-                <Pressable onPress={props.closeModal} style={styles.button}>
+                <Pressable onPress={props.closeLocationModal} style={styles.button}>
                     <Text style={styles.buttonText}>Close Modal</Text>
                 </Pressable>
             </View>
