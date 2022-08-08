@@ -1,5 +1,5 @@
 import { Image, StyleSheet, Text, View, Pressable, Alert } from 'react-native';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigation } from '@react-navigation/core';
 import * as Location from 'expo-location';
 import LocationSwipeable from '../LocationSwipeable';
@@ -8,9 +8,9 @@ import config from '../../config';
 
 
 const Footer = (props) => {
-    const [userLocation, setUserLocation] = useState({});
+    const [userLocation, setUserLocation] = useState(null);
     const [locationOptionModalIsVisible, setLocationOptionModalIsVisible] = useState(false);
-    const [locationsInfo, setLocationsInfo] = useState([{'user_ratings_total': null, 'price_level': null, 'rating': null, 'name': null, 'photos': [{'photo_reference': null}] }]);
+    const [locationsInfo, setLocationsInfo] = useState([{ 'user_ratings_total': null, 'price_level': null, 'rating': null, 'name': null, 'photos': [{ 'photo_reference': null }] }]);
 
     const navigation = useNavigation()
 
@@ -27,8 +27,8 @@ const Footer = (props) => {
                     text: "Don't do it",
                     onPress: () => locationHandler()
                 },
-                { 
-                    text: "Do it!", 
+                {
+                    text: "Do it!",
                     onPress: () => locationHandler()
                 }
             ]
@@ -39,23 +39,21 @@ const Footer = (props) => {
         navigation.navigate("Notifications")
     }
 
-    const locationHandler = async () => {
-        // code to grab location, expo-location
-        const location = await (async () => {
+    useEffect(() => {
+        (async () => {
             let { status } = await Location.requestForegroundPermissionsAsync();
             if (status !== 'granted') {
                 setErrorMsg('Permission to access location was denied');
                 return;
             }
-            let myLocation = await Location.getCurrentPositionAsync({});
-            console.log(myLocation);
-            setUserLocation(myLocation);
-        })();
 
-        await getNearbyLocations();
-    };
+            let location = await Location.getCurrentPositionAsync({});
+            setUserLocation(location);
+        })();
+    }, []);
 
     const getNearbyLocations = async () => {
+        console.log(userLocation);
         await axios.get(`https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${userLocation.coords.latitude}%2C${userLocation.coords.longitude}&radius=1000&type=restaurant&key=${config.GOOGLE_PLACES_API_KEY}`)
             .then(response => {
                 console.log(response.data.results);
@@ -63,6 +61,38 @@ const Footer = (props) => {
             });
         setLocationOptionModalIsVisible(true);
     }
+
+    const locationHandler = () => {
+       getNearbyLocations();
+    };
+
+
+
+    // const locationHandler = async () => {
+    //     // code to grab location, expo-location
+    //     const location = await (async () => {
+    //         let { status } = await Location.requestForegroundPermissionsAsync();
+    //         if (status !== 'granted') {
+    //             setErrorMsg('Permission to access location was denied');
+    //             return;
+    //         }
+    //         let myLocation = await Location.getCurrentPositionAsync({});
+    //         console.log(myLocation);
+    //         setUserLocation(myLocation);
+    //         console.log('setUserLocation')
+    //     })()
+
+    //     await getNearbyLocations();
+    // };
+
+    // const getNearbyLocations = async (location) => {
+    //     await axios.get(`https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${location.coords.latitude}%2C${location.coords.longitude}&radius=1000&type=restaurant&key=${config.GOOGLE_PLACES_API_KEY}`)
+    //         .then(response => {
+    //             console.log(response.data.results);
+    //             setLocationsInfo(response.data.results)
+    //         });
+    //     setLocationOptionModalIsVisible(true);
+    // }
 
     const closeLocationModal = () => {
         setLocationOptionModalIsVisible(false);

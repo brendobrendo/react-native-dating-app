@@ -20,6 +20,10 @@ const Header = (props) => {
             .catch(error => alert(error.message))
     }
 
+    const goToMessages = () => {
+        navigation.navigate("Messages");
+    }
+
     const closeUser = () => {
         setUserModal(false)
     }
@@ -48,7 +52,7 @@ const Header = (props) => {
                     <Image style={styles.image} source={require('../../assets/images/profileicon.png')} />
                 </Pressable>
 
-                <Pressable onPress={openMessages}>
+                <Pressable onPress={goToMessages}>
                     <Image style={styles.image} source={require('../../assets/images/messageicon.png')} />
                 </Pressable>
             </View>

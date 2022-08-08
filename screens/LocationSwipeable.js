@@ -12,11 +12,19 @@ const LocationSwipeable = (props) => {
     }, [placeIdx]);
 
     const getNext = () => {
-        setPlaceIdx((placeIdx) => placeIdx+1);
+        if (placeIdx===props.placesInfo.length-1) {
+            setPlaceIdx(0)
+        } else {
+            setPlaceIdx((placeIdx) => placeIdx+1);
+        }
     };
 
     const getPrev = () => {
-        setPlaceIdx((placeIdx) => placeIdx-1);
+        if (placeIdx===0) {
+            setPlaceIdx(placesInfo.length-1)
+        } else {
+            setPlaceIdx((placeIdx) => placeIdx-1);
+        }
     };
 
     return (

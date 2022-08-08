@@ -7,31 +7,46 @@ import Header from './components/Header';
 import Footer from './components/Footer'
 
 const Messages = (props) => {
-    const [messages, setMessages] = useState([]);
+    const [collectionTable, setCollectionTable] = useState("");
+    const [chatMessages, setChatMessages] = useState([]);
     const [newMessage, setNewMessage] = useState("");
 
+    // useLayoutEffect(() => {
+    //     const q = query(collection(db, "messages"), orderBy('createdAt', 'desc'), limit(5))
+    //     // Creates snapshot of the last 5 messages in the messages collection
+    //     const unsubscribe = onSnapshot(q, (snapshot) => {
+    //         let new5messages = [];
+    //         snapshot.forEach((doc) => {
+    //             new5messages.push(doc.data());
+    //         })
+    //         setMessages(new5messages);
+    //     });
+    //     return unsubscribe
+    // }, []);
 
     useLayoutEffect(() => {
-        const q = query(collection(db, "messages"), orderBy('createdAt', 'desc'), limit(5))
-        // Creates snapshot of the last 5 messages in the messages collection
-        const unsubscribe = onSnapshot(q, (snapshot) => {
-            let new5messages = [];
-            snapshot.forEach((doc) => {
-                new5messages.push(doc.data());
-            })
-            setMessages(new5messages);
-            // setMessages({last5messages: new5messages});
-        });
-        return unsubscribe
+        if (collectionTable !== "") {
+            const q = query(collection(db, collectionTable), orderBy('createdAt', 'desc'))
+            // Creates snapshot of the last 5 messages in the messages collection
+            const unsubscribe = onSnapshot(q, (snapshot) => {
+                let collectedMessages = [];
+                snapshot.forEach((doc) => {
+                    collectedMessages.push(doc.data());
+                })
+                setChatMessages(collectedMessages);
+            });
+            return unsubscribe
+        };
     }, []);
 
     const handleNewMessage = () => {
         try {
-            const docRef = addDoc(collection(db, "messages"), {
+            const docRef = addDoc(collection(db, collectionTable), {
                 senderId: authentication.currentUser.uid,
                 text: newMessage,
                 createdAt: Timestamp.now(),
-                recipientId: "KLUDoUpCZoRommxPFUp4qKr6nZM2"
+                createdAt: Timestamp.now(),
+                recipientId: 'K7kChQS90FS0DEVPEG5Wj5z8g972'
             })
             console.log("Document written with ID: ", docRef.id);
             setNewMessage("")
@@ -42,10 +57,10 @@ const Messages = (props) => {
     }
 
     return (
-        <Modal visible={props.visible} animationType="slide" style={styles.container}>
+        <Modal visible={false} animationType="slide" style={styles.container}>
             <Header />
             <View style={styles.messagesContainer}>
-                <FlatList data={messages}
+                <FlatList data={chatMessages}
                 renderItem={(msgData) => {
                     return (
                         <ChatMessage messageText={msgData.item} />
@@ -94,23 +109,23 @@ const styles = StyleSheet.create({
         color: 'white',
         fontWeight: '700',
         fontSize: 16,
-      },
-      buttonContainer: {
+    },
+    buttonContainer: {
         justifyContent: 'center',
         alignItems: 'center',
-      },
-      messagesContainer: {
+    },
+    messagesContainer: {
         marginTop: 40,
-      },
-      geoButton: {
+    },
+    geoButton: {
         backgroundColor: 'green',
         width: '80%',
         padding: 15,
         borderRadius: 10,
         alignItems: 'center',
         marginTop: 40,
-      },
-      input: {
+    },
+    input: {
         backgroundColor: 'white',
         paddingHorizontal: 15,
         paddingVertical: 10,
