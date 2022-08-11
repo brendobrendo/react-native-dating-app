@@ -1,14 +1,17 @@
-import { Image, StyleSheet, Text, View, Pressable, Alert } from 'react-native';
+import { Image, StyleSheet, Text, View, Pressable, Alert, TextInput } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import { useNavigation } from '@react-navigation/core';
 import * as Location from 'expo-location';
 import LocationSwipeable from '../LocationSwipeable';
 import axios from 'axios';
 import config from '../../config';
+import Input from './Input';
 
 
 const Footer = (props) => {
     const [userLocation, setUserLocation] = useState(null);
+    const [manualLocation, setManualLocation] = useState("");
+    const [manualInput, setManualInput] = useState(false)
     const [locationOptionModalIsVisible, setLocationOptionModalIsVisible] = useState(false);
     const [locationsInfo, setLocationsInfo] = useState([{ 'user_ratings_total': null, 'price_level': null, 'rating': null, 'name': null, 'photos': [{ 'photo_reference': null }] }]);
 
@@ -24,12 +27,12 @@ const Footer = (props) => {
             "",
             [
                 {
-                    text: "Don't do it",
-                    onPress: () => locationHandler()
+                    text: "Enter a location",
+                    onPress: () => locationHandler('input')
                 },
                 {
-                    text: "Do it!",
-                    onPress: () => locationHandler()
+                    text: "Use my location",
+                    onPress: () => locationHandler('gps')
                 }
             ]
         )
@@ -52,19 +55,51 @@ const Footer = (props) => {
         })();
     }, []);
 
-    const getNearbyLocations = async () => {
-        console.log(userLocation);
-        await axios.get(`https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${userLocation.coords.latitude}%2C${userLocation.coords.longitude}&radius=1000&type=restaurant&key=${config.GOOGLE_PLACES_API_KEY}`)
-            .then(response => {
-                console.log(response.data.results);
-                setLocationsInfo(response.data.results)
-            });
-        setLocationOptionModalIsVisible(true);
+    const getNearbyLocations = async (choice) => {
+
+        if (choice == 'gps') {
+            console.log(choice)
+            await axios.get(`https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${userLocation.coords.latitude}%2C${userLocation.coords.longitude}&radius=1000&type=restaurant&key=${config.GOOGLE_PLACES_API_KEY}`)
+                .then(response => {
+                    console.log(response.data.results);
+                    setLocationsInfo(response.data.results)
+                });
+            setLocationOptionModalIsVisible(true);
+        }
+        else {
+            console.log(choice)
+            await axios.get(`https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${manualLocation}&radius=1000&type=restaurant&key=${config.GOOGLE_PLACES_API_KEY}`)
+                .then(response => {
+                    console.log(response.data.results);
+                    setLocationsInfo(response.data.results)
+                })
+                .then(
+                    setLocationOptionModalIsVisible(true)
+                );
+        }
+
     }
 
-    const locationHandler = () => {
-       getNearbyLocations();
+    const locationHandler = (choice) => {
+        if (choice == 'gps') {
+            getNearbyLocations(choice);
+        }
+        else {
+            manualOpen()
+        }
     };
+
+    const manualOpen = () => {
+        setManualInput(true)
+    }
+
+    const manualClose = (option) => {
+        setManualInput(false)
+        if (option != 'cancel'){
+            console.log("searching user input")
+            getNearbyLocations('input')
+        }
+    }
 
 
 
@@ -102,6 +137,8 @@ const Footer = (props) => {
 
     return (
         <View style={styles.row}>
+            <Input isVisible={manualInput} manualClose={manualClose} setManualLocation={setManualLocation} />
+
             <Pressable onPress={navHome}>
                 <Image style={styles.image} source={require("../../assets/images/homeicon.png")} />
             </Pressable>
