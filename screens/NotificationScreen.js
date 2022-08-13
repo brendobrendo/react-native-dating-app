@@ -7,6 +7,7 @@ import { query, getDoc, doc } from 'firebase/firestore';
 
 const NotificationScreen = () => {
   const [notifications, setNotifications] = useState([]);
+  const selected = 'notifications';
   
   useEffect (() => {
     (async () => {
@@ -50,7 +51,7 @@ const NotificationScreen = () => {
         }}
       />
       </View>
-    <Footer />
+    <Footer selected={selected}/>
     </View>
   )
 }

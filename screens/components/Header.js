@@ -46,11 +46,11 @@ const Header = (props) => {
 
             {/* top buttons */}
             <View style={styles.row}>
-                <Pressable onPress={openuser}>
+                <Pressable onPress={openuser} style={[styles.press, styles.iconNotSelected]}>
                     <Image style={styles.image} source={require('../../assets/images/profileicon.png')} />
                 </Pressable>
 
-                <Pressable onPress={goToMessages}>
+                <Pressable onPress={goToMessages} style={props.selected ? [styles.press, styles.iconSelected] : [styles.press, styles.iconNotSelected]}>
                     <Image style={styles.image} source={require('../../assets/images/messageicon.png')} />
                 </Pressable>
             </View>
@@ -72,9 +72,24 @@ const styles = StyleSheet.create({
         borderBottomWidth: 2,
         paddingBottom: 15
     },
+    press: {
+        marginHorizontal: 30
+    },
     image: {
         width: 40,
         height: 40,
-        marginHorizontal: 30
+    },
+    iconNotSelected: {
+        paddingVertical: 5,
+        paddingHorizontal: 20
+    },
+    iconSelected: {
+        // backgroundColor: "red",
+        // borderColor: "red",
+        // borderWidth: 1,
+        paddingVertical: 5,
+        paddingHorizontal: 20,
+        borderRadius: 5,
+        backgroundColor: "darkgrey"
     }
 })

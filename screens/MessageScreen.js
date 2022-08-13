@@ -11,6 +11,7 @@ const MessageScreen = () => {
     const [chatModalVisible, setChatModalVisible] = useState(false);
     const [clickedCollectionId, setClickedCollectionId] = useState("textMessages2");
     const [chattingPartner, setChattingPartner] = useState(authentication.currentUser.uid);
+    const selected = true;
 
     useEffect(() => {
         (async () => {
@@ -81,7 +82,7 @@ const MessageScreen = () => {
 
     return (
         <View style={styles.container}>
-            <Header />
+            <Header selected={selected}/>
             <View style={styles.titleWrapper}>
                 <Text style={styles.titleText}>Messages</Text>
             </View>
