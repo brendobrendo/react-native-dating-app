@@ -68,8 +68,9 @@ const Footer = (props) => {
         }
         else {
             console.log(choice)
-            await axios.get(`https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${manualLocation}&radius=1000&type=restaurant&key=${config.GOOGLE_PLACES_API_KEY}`)
+            await axios.get(`https://maps.googleapis.com/maps/api/place/textsearch/json?query=restauraunts%20near%20${manualLocation}&key=${config.GOOGLE_PLACES_API_KEY}`)
                 .then(response => {
+                    console.log(manualLocation)
                     console.log(response.data.results);
                     setLocationsInfo(response.data.results)
                 })
