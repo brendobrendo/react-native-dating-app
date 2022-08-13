@@ -4,7 +4,6 @@ import { useNavigation } from '@react-navigation/core'
 import { signOut } from 'firebase/auth';
 import { authentication } from '../../firebase';
 import UserProfile from '../UserProfile'
-import Messages from '../Messages'
 
 const Header = (props) => {
 
@@ -44,7 +43,6 @@ const Header = (props) => {
         <View style={styles.margintop}>
             {/* modals */}
             <UserProfile isVisible={userModal} closeUser={closeUser} signOut={handleSignOut} />
-            <Messages visible={messagesModal} closeMessages={closeMessages} />
 
             {/* top buttons */}
             <View style={styles.row}>

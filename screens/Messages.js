@@ -1,33 +1,20 @@
 import { Modal, Pressable, StyleSheet, Text, View, FlatList, TextInput, KeyboardAvoidingView } from 'react-native';
-import React, { useState, useLayoutEffect } from 'react';
-import { collection, addDoc, Timestamp, query, orderBy, limit, onSnapshot, where, getDocs } from 'firebase/firestore';
+import React, { useState, useLayoutEffect, useEffect } from 'react';
+import { collection, addDoc, Timestamp, query, orderBy, onSnapshot, doc, getDoc } from 'firebase/firestore';
 import { db, authentication } from '../firebase';
 import ChatMessage from './components/ChatMessage';
-import Header from './components/Header';
-import Footer from './components/Footer'
+import MessagesHeader from './components/MessagesHeader';
 
 const Messages = (props) => {
-    const [collectionTable, setCollectionTable] = useState("");
     const [chatMessages, setChatMessages] = useState([]);
     const [newMessage, setNewMessage] = useState("");
-
-    // useLayoutEffect(() => {
-    //     const q = query(collection(db, "messages"), orderBy('createdAt', 'desc'), limit(5))
-    //     // Creates snapshot of the last 5 messages in the messages collection
-    //     const unsubscribe = onSnapshot(q, (snapshot) => {
-    //         let new5messages = [];
-    //         snapshot.forEach((doc) => {
-    //             new5messages.push(doc.data());
-    //         })
-    //         setMessages(new5messages);
-    //     });
-    //     return unsubscribe
-    // }, []);
+    const [partnerProfile, setPartnerProfile] = useState({'firstName': null, 'lastName': null});
+    const [selfProfile, setSelfProfile] = useState({});
 
     useLayoutEffect(() => {
-        if (collectionTable !== "") {
-            const q = query(collection(db, collectionTable), orderBy('createdAt', 'desc'))
-            // Creates snapshot of the last 5 messages in the messages collection
+        if (props.collectionId !== "textMessages2") {
+            console.log('the collection id is: ', props.collectionId);
+            const q = query(collection(db, props.collectionId), orderBy('createdAt'))
             const unsubscribe = onSnapshot(q, (snapshot) => {
                 let collectedMessages = [];
                 snapshot.forEach((doc) => {
@@ -36,19 +23,41 @@ const Messages = (props) => {
                 setChatMessages(collectedMessages);
             });
             return unsubscribe
-        };
+        }       
+    }, [props.collectionId]);
+
+    useEffect(() => {
+        (async () => {
+            const q = query(doc(db, 'UserInfo', props.partnerId))
+
+            const qSnapshot = await getDoc(q);
+            setPartnerProfile(qSnapshot.data())
+        })();
+    }, [props.collectionId])
+
+    useEffect(() => {
+        (async () => {
+            const q = query(doc(db, 'UserInfo', props.partnerId))
+
+            const qSnapshot = await getDoc(q);
+            setSelfProfile(qSnapshot.data())
+        })();
     }, []);
 
     const handleNewMessage = () => {
         try {
-            const docRef = addDoc(collection(db, collectionTable), {
+            const docRef = addDoc(collection(db, props.collectionId), {
                 senderId: authentication.currentUser.uid,
+                senderFirstName: selfProfile.firstName,
+                senderLastName: selfProfile.lastName,
                 text: newMessage,
                 createdAt: Timestamp.now(),
                 createdAt: Timestamp.now(),
-                recipientId: 'K7kChQS90FS0DEVPEG5Wj5z8g972'
+                recipientId: props.partnerId,
+                recipientFirstName: partnerProfile.firstName,
+                recipientLastName: partnerProfile.lastName
             })
-            console.log("Document written with ID: ", docRef.id);
+            
             setNewMessage("")
             
         } catch (e) {
@@ -57,8 +66,8 @@ const Messages = (props) => {
     }
 
     return (
-        <Modal visible={false} animationType="slide" style={styles.container}>
-            <Header />
+        <Modal visible={props.chatModal} animationType="slide" style={styles.container}>
+            <MessagesHeader chatPartner={partnerProfile} closeMessage={props.closeModal}/>
             <View style={styles.messagesContainer}>
                 <FlatList data={chatMessages}
                 renderItem={(msgData) => {
@@ -69,22 +78,18 @@ const Messages = (props) => {
             />
             </View>
             <KeyboardAvoidingView behavior="padding">
-            <View style={styles.buttonContainer}>
-                <Pressable onPress={props.closeMessages} style={styles.button}>
-                    <Text style={styles.buttonText}>Close messages</Text>
-                </Pressable>
+            <View style={styles.footer}>
                 <TextInput
-                        placeholder='Add new message'
-                        value={newMessage}
-                        onChangeText={text => setNewMessage(text)}
-                        style={styles.input}
+                    placeholder='Add new message'
+                    value={newMessage}
+                    onChangeText={text => setNewMessage(text)}
+                    style={styles.input}
                     />
                 <Pressable onPress={handleNewMessage} style={styles.button}>
                     <Text style={styles.buttonText}>Add Message</Text>
                 </Pressable>
             </View>
             </KeyboardAvoidingView>
-            <Footer />
         </Modal>
     )
 }
@@ -103,18 +108,24 @@ const styles = StyleSheet.create({
         padding: 15,
         borderRadius: 10,
         alignItems: 'center',
-        marginTop: 40,
+        marginTop: 20,
     },
     buttonText: {
         color: 'white',
         fontWeight: '700',
         fontSize: 16,
     },
-    buttonContainer: {
+    footer: {
         justifyContent: 'center',
         alignItems: 'center',
+        borderColor: "gray",
+        borderTopWidth: 2,
+        justifyContent: "space-around",
+        marginBottom: 15,
+        paddingTop: 15,
     },
     messagesContainer: {
+        flex: 1,
         marginTop: 40,
     },
     geoButton: {
