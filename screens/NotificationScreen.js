@@ -1,26 +1,30 @@
-import { StyleSheet, Text, View, FlatList, Image } from 'react-native';
+import { StyleSheet, Text, View, FlatList, Image, Pressable } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import Header from './components/Header';
 import Footer from './components/Footer';
-import { db } from '../firebase';
-import { query, getDocs, collection } from 'firebase/firestore';
+import { authentication, db } from '../firebase';
+import { query, getDoc, doc } from 'firebase/firestore';
 
 const NotificationScreen = () => {
   const [notifications, setNotifications] = useState([]);
   
   useEffect (() => {
-    const getNotifications = async () => {
-      const q = query(collection(db, "UserInfo"));
-      const querySnap = await getDocs(q);
+    (async () => {
+      const q = query(doc(db, "UserInfo", authentication.currentUser.uid));
+      const querySnap = await getDoc(q);
       let queryNotfications = [];
-      querySnap.forEach((doc) => {
-        queryNotfications.push(doc.data());
-        console.log(doc.data());
-      })
 
-      setNotifications(queryNotfications);
-    }  
-    getNotifications(); 
+      querySnap.data().matchSuggestions.forEach((suggestion) => {
+        (async () => {
+          const docId = "ms" + authentication.currentUser.uid + suggestion
+          const matchSuggestion = query(doc(db, "MatchSuggestions", docId))
+
+          const matchInfo = await getDoc(matchSuggestion);
+          queryNotfications.push(matchInfo.data());
+          setNotifications(queryNotfications);
+        })()
+      })
+    })(); 
   }, []);
 
   return (
@@ -33,13 +37,15 @@ const NotificationScreen = () => {
       <FlatList data={notifications}
         renderItem={(notData) => {
           return (
+            <Pressable onPress={()=> console.log(notData.item.matchUserId)}>
             <View style={styles.notificationBox}>
               <Image style={styles.image} source={require('../assets/images/profileicon.png')} />
               <View>
-                <Text style={styles.notificationNameText}>{notData.item.firstName} {notData.item.lastName}</Text>
-                <Text>Is also interested in McGilvra's</Text>
+                <Text style={styles.notificationNameText}>{notData.item.matchFirstName} {notData.item.matchLastName}</Text>
+                <Text>Is also interested in {notData.item.matchRestName}</Text>
               </ View>
             </View>
+            </Pressable>
           )
         }}
       />
