@@ -9,9 +9,11 @@ import Footer from './components/Footer';
 
 
 
-const HomeScreen = () => {
+const HomeScreen = (props) => {
 
   const [booktest, setbooktest] = useState("")
+  const selected = 'home';
+  // console.log(props)
 
   useEffect(() => {
     axios.get(`${ApiRoot}/api/books`)
@@ -48,6 +50,7 @@ const HomeScreen = () => {
     checkUser();
   }, [])
 
+  console.log("home screen:", selected)
   return (
     <View style={styles.container}>
       <Header />
@@ -58,7 +61,7 @@ const HomeScreen = () => {
 
       </View>
 
-      <Footer style={styles.flex} />
+      <Footer style={styles.flex} selected={selected}/>
     </View>
   )
 }

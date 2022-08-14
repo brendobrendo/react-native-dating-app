@@ -14,6 +14,7 @@ const Footer = (props) => {
     const [manualInput, setManualInput] = useState(false)
     const [locationOptionModalIsVisible, setLocationOptionModalIsVisible] = useState(false);
     const [locationsInfo, setLocationsInfo] = useState([{ 'user_ratings_total': null, 'price_level': null, 'rating': null, 'name': null, 'photos': [{ 'photo_reference': null }] }]);
+    const [alert, setAlert] = useState(false)
 
     const navigation = useNavigation()
 
@@ -22,6 +23,7 @@ const Footer = (props) => {
     }
 
     const navNavigation = () => {
+        setAlert(true);
         Alert.alert(
             "select a navigation style",
             "",
@@ -68,8 +70,9 @@ const Footer = (props) => {
         }
         else {
             console.log(choice)
-            await axios.get(`https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${manualLocation}&radius=1000&type=restaurant&key=${config.GOOGLE_PLACES_API_KEY}`)
+            await axios.get(`https://maps.googleapis.com/maps/api/place/textsearch/json?query=restauraunts%20near%20${manualLocation}&key=${config.GOOGLE_PLACES_API_KEY}`)
                 .then(response => {
+                    console.log(manualLocation)
                     console.log(response.data.results);
                     setLocationsInfo(response.data.results)
                 })
@@ -95,10 +98,12 @@ const Footer = (props) => {
 
     const manualClose = (option) => {
         setManualInput(false)
-        if (option != 'cancel'){
+        if (option != 'cancel') {
             console.log("searching user input")
             getNearbyLocations('input')
+            setAlert(false)
         }
+        setAlert(false)
     }
 
 
@@ -139,15 +144,15 @@ const Footer = (props) => {
         <View style={styles.row}>
             <Input isVisible={manualInput} manualClose={manualClose} setManualLocation={setManualLocation} />
 
-            <Pressable onPress={navHome}>
+            <Pressable onPress={navHome} style={props.selected == 'home' && !alert ? styles.iconSelected : styles.iconNotSelected}>
                 <Image style={styles.image} source={require("../../assets/images/homeicon.png")} />
             </Pressable>
 
-            <Pressable onPress={navNavigation}>
+            <Pressable onPress={navNavigation} style={alert ? styles.iconSelected : styles.iconNotSelected}>
                 <Image style={styles.image} source={require("../../assets/images/navigationicon.png")} />
             </Pressable>
 
-            <Pressable onPress={navNotify}>
+            <Pressable onPress={navNotify} style={props.selected == 'notifications' && !alert ? styles.iconSelected : styles.iconNotSelected}>
                 <Image style={styles.image} source={require("../../assets/images/bellicon.png")} />
             </Pressable>
             <LocationSwipeable placesInfo={locationsInfo} showLocationModal={locationOptionModalIsVisible} closeLocationModal={closeLocationModal} />
@@ -170,5 +175,18 @@ const styles = StyleSheet.create({
     image: {
         width: 40,
         height: 40
+    },
+    iconNotSelected: {
+        paddingVertical: 1,
+        paddingHorizontal: 10
+    },
+    iconSelected: {
+        // backgroundColor: "red",
+        // borderColor: "red",
+        // borderWidth: 1,
+        paddingVertical: 1,
+        paddingHorizontal: 10,
+        borderRadius: 5,
+        backgroundColor: "darkgrey"
     }
 })

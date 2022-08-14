@@ -9,6 +9,7 @@ import { useNavigation } from '@react-navigation/core';
 const NotificationScreen = () => {
   const [notifications, setNotifications] = useState([]);
   const navigation = useNavigation()
+  const selected = 'notifications';
   
   useEffect (() => {
     (async () => {
@@ -56,7 +57,7 @@ const NotificationScreen = () => {
         }}
       />
       </View>
-    <Footer />
+    <Footer selected={selected}/>
     </View>
   )
 }
