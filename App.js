@@ -5,6 +5,7 @@ import { NavigationContainer } from "@react-navigation/native"
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import NotificationScreen from './screens/NotificationScreen';
 import MessageScreen from './screens/MessageScreen';
+import MatchProfile from './screens/MatchProfile';
 
 const Stack = createNativeStackNavigator();
 
@@ -16,6 +17,7 @@ export default function App() {
         <Stack.Screen options={{headerShown: false}} name='Home' component={HomeScreen} />
         <Stack.Screen options={{headerShown: false}} name='Notifications' component={NotificationScreen} />
         <Stack.Screen options={{headerShown: false}} name='Messages' component={MessageScreen} />
+        <Stack.Screen options={{headerShown: false}} name='MatchProfile' component={MatchProfile} />
       </Stack.Navigator>
     </NavigationContainer>
   );
