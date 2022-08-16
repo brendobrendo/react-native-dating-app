@@ -11,15 +11,13 @@ const Stack = createNativeStackNavigator();
 
 export default function App() {
 
-  const [currentPage, setCurrentPage] = useState("")
-
   return (
     <NavigationContainer>
       <Stack.Navigator>
         <Stack.Screen options={{ headerShown: false }} name='Login' component={LoginScreen} />
-        <Stack.Screen options={{ headerShown: false }} name='Home' component={HomeScreen} currentPage={setCurrentPage} />
-        <Stack.Screen options={{ headerShown: false }} name='Notifications' component={NotificationScreen} currentPage={setCurrentPage} />
-        <Stack.Screen options={{ headerShown: false }} name='Messages' component={MessageScreen} currentPage={setCurrentPage} />
+        <Stack.Screen options={{ headerShown: false }} name='Home' component={HomeScreen} />
+        <Stack.Screen options={{ headerShown: false }} name='Notifications' component={NotificationScreen} />
+        <Stack.Screen options={{ headerShown: false }} name='Messages' component={MessageScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
