@@ -4,9 +4,11 @@ import Header from './components/Header';
 import Footer from './components/Footer';
 import { authentication, db } from '../firebase';
 import { query, getDoc, doc } from 'firebase/firestore';
+import { useNavigation } from '@react-navigation/core';
 
 const NotificationScreen = () => {
   const [notifications, setNotifications] = useState([]);
+  const navigation = useNavigation()
   const selected = 'notifications';
   
   useEffect (() => {
@@ -28,6 +30,10 @@ const NotificationScreen = () => {
     })(); 
   }, []);
 
+  const getMatchProfile = (matchUserId) => {
+    navigation.navigate('MatchProfile', {matchUserId: matchUserId});
+  }
+
   return (
     <View style={styles.container}>
     <Header />
@@ -38,7 +44,7 @@ const NotificationScreen = () => {
       <FlatList data={notifications}
         renderItem={(notData) => {
           return (
-            <Pressable onPress={()=> console.log(notData.item.matchUserId)}>
+            <Pressable onPress={()=> getMatchProfile(notData.item.matchUserId)}>
             <View style={styles.notificationBox}>
               <Image style={styles.image} source={require('../assets/images/profileicon.png')} />
               <View>

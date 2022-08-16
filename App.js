@@ -5,6 +5,7 @@ import { NavigationContainer } from "@react-navigation/native"
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import NotificationScreen from './screens/NotificationScreen';
 import MessageScreen from './screens/MessageScreen';
+import MatchProfile from './screens/MatchProfile';
 import { useState } from 'react';
 
 const Stack = createNativeStackNavigator();
